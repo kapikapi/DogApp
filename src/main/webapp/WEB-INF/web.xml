@@ -3,5 +3,17 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-  <display-name>Archetype Created Web Application</display-name>
+  <display-name>Dog World Application</display-name>
+
+  <servlet>
+    <servlet-name>MainServlet</servlet-name>
+    <servlet-class>com.epam.dog.MainServlet</servlet-class>
+  </servlet>
+
+
+  <servlet-mapping>
+    <servlet-name>MainServlet</servlet-name>
+    <url-pattern>kkk</url-pattern>
+  </servlet-mapping>
+
 </web-app>
