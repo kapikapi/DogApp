@@ -13,7 +13,7 @@
 
   <servlet-mapping>
     <servlet-name>MainServlet</servlet-name>
-    <url-pattern>kkk</url-pattern>
+    <url-pattern>/</url-pattern>
   </servlet-mapping>
 
 </web-app>
