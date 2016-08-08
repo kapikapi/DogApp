@@ -1,21 +1,15 @@
 package com.epam.dog;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@RestController
 public class DogController {
 
     static List<Dog> dogs = new ArrayList<>();
@@ -29,8 +23,8 @@ public class DogController {
 
     private static Dog getDogById(List<Dog> dogList, int id) {
         setDogs();
-        for(Dog dog : dogList) {
-            if(dog != null && dog.getId() == id) {
+        for (Dog dog : dogList) {
+            if (dog != null && dog.getId() == id) {
                 return dog;
             }
         }
@@ -38,23 +32,14 @@ public class DogController {
     }
 
     @RequestMapping(value = "/dog/{id}", method = RequestMethod.GET)
-    public ResponseEntity<String> getDog(@PathVariable("id") int id) {
-
+    public ResponseEntity<Dog> getDog(@PathVariable("id") int id) {
         Dog dog = DogController.getDogById(dogs, id);
         if (dog == null) {
             System.out.println("Dog with id " + id + " ran away");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            String jsonDog = mapper.writeValueAsString(dog);
-            return new ResponseEntity<>(jsonDog, HttpStatus.OK);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
-        }
-
+        return new ResponseEntity<>(dog, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/dog", method = RequestMethod.POST)
@@ -76,13 +61,27 @@ public class DogController {
         Dog updatedDog = getDogById(dogs, id);
         if (updatedDog == null) {
             System.out.println("Dog with id " + id + " ran away");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return null;
         }
         int index = dogs.indexOf(updatedDog);
         updatedDog.setName(dog.getName());
         updatedDog.setHeight(dog.getHeight());
         updatedDog.setWeight(dog.getWeight());
         dogs.set(index, updatedDog);
+
         return new ResponseEntity<>(updatedDog, HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = "/dog/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Dog> deleteUser(@PathVariable("id") int id) {
+
+        Dog dog = getDogById(dogs, id);
+        if (dog == null) {
+            System.out.println("Unable to delete dor with id " + id + ". Dog with such id is not found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        dogs.remove(dog);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
