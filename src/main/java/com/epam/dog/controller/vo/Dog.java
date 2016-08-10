@@ -1,18 +1,11 @@
-package com.epam.dog;
+package com.epam.dog.controller.vo;
 
-class Dog {
+public class Dog {
 
     private int id;
     private String name;
     private int height;
     private int weight;
-
-    Dog(int id, String name, int height, int weight) {
-        this.id = id;
-        this.name = name;
-        this.height = height;
-        this.weight = weight;
-    }
 
     public int getId() {
         return id;
