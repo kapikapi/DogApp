@@ -1,6 +1,8 @@
 package com.epam.dog.controller;
 
 import com.epam.dog.controller.vo.Dog;
+import com.epam.dog.dao.DogDAO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,45 +13,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Controller
 public class DogController {
 
-    private static final Map<Integer, Dog> dogsById = new HashMap<>();
+    private final DogDAO dogDAO;
 
-    private static Dog getDogById(int id) {
-        return dogsById.get(id);
-    }
-
-    private static int saveDog(Dog dog) {
-        dogsById.put(dog.getId(), dog);
-        return dog.getId();
-    }
-
-    private static Dog freeDogById(int id) {
-        return dogsById.remove(id);
-    }
-
-    private static boolean hasDog(int id) {
-        return dogsById.containsKey(id);
+    @Autowired
+    public DogController(DogDAO dogDAO) {
+        this.dogDAO = dogDAO;
     }
 
     @RequestMapping(value = "/dog", method = RequestMethod.GET)
-    public ResponseEntity<Map<Integer, Dog>> getAllDogs() {
-        if(dogsById.isEmpty()){
+    public ResponseEntity<List<Dog>> getAllDogs() {
+        Map<Integer, Dog> dogsMap = dogDAO.getAllDogs();
+        if(dogsMap.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            List<Dog> dogList = new ArrayList<>(dogsMap.values());
+            return new ResponseEntity<>(dogList, HttpStatus.OK);
         }
-        return new ResponseEntity<>(dogsById, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/dog/{id}", method = RequestMethod.GET)
     public ResponseEntity<Dog> getDog(@PathVariable("id") int id) {
 
-        Dog dog = getDogById(id);
+        Dog dog = dogDAO.getDogById(id);
         if (dog == null) {
-            System.out.println("Dog with id " + id + " ran away");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(dog, HttpStatus.OK);
@@ -57,11 +50,10 @@ public class DogController {
 
     @RequestMapping(value = "/dog", method = RequestMethod.POST)
     public ResponseEntity<Dog> createDog(@RequestBody Dog dog, UriComponentsBuilder ucBuilder) {
-        if (hasDog(dog.getId())) {
-            System.out.println("Dog with id " + dog.getId() + " already exists");
+        if (dogDAO.hasDog(dog.getId())) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } else {
-            saveDog(dog);
+            dogDAO.saveDog(dog);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(ucBuilder.path("/dog/{id}").buildAndExpand(dog.getId()).toUri());
@@ -71,11 +63,10 @@ public class DogController {
 
     @RequestMapping(value = "/dog/{id}", method = RequestMethod.PUT)
     public ResponseEntity<Dog> updateDog(@PathVariable("id") int id, @RequestBody Dog dog) {
-        if (!hasDog(id)) {
-            System.out.println("Dog with id " + id + " ran away");
+        if (!dogDAO.hasDog(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            Dog updatedDog = getDogById(id);
+            Dog updatedDog = dogDAO.getDogById(id);
             updatedDog.setName(dog.getName());
             updatedDog.setHeight(dog.getHeight());
             updatedDog.setWeight(dog.getWeight());
@@ -85,11 +76,10 @@ public class DogController {
 
     @RequestMapping(value = "/dog/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Dog> deleteDog(@PathVariable("id") int id) {
-        if (!hasDog(id)) {
-            System.out.println("Unable to delete dor with id " + id + ". Dog with such id is not found");
+        if (!dogDAO.hasDog(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            return new ResponseEntity<>(freeDogById(id), HttpStatus.OK);
+            return new ResponseEntity<>(dogDAO.freeDogById(id), HttpStatus.OK);
         }
     }
 }
