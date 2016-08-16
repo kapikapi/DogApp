@@ -18,12 +18,10 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public class DogControllerTest {
     private Map<Integer, Dog> dogsMap;
-//    private DogController dogController;
 
     @BeforeSuite
     public void shouldSetDogsInitialData() {
         DogDAO dogDAO = new DogHandler();
-//        dogController = new DogController();
         dogsMap = dogDAO.getAllDogs();
     }
 
@@ -34,7 +32,7 @@ public class DogControllerTest {
         };
     }
 
-    @Test(dataProvider = "shouldSetFirstDogsId")
+    @Test(dataProvider = "firstId")
     public void shouldGetDogById(String paramName, int id) {
         given().
                 pathParam(paramName, id).
@@ -83,7 +81,7 @@ public class DogControllerTest {
         };
     }
 
-    @Test(dataProvider = "shouldSetNewDogData")
+    @Test(dataProvider = "newDog")
     public void shouldSaveSpecifiedDog(String paramName, Dog newDog) {
         given()
                 .contentType(ContentType.JSON)
@@ -94,31 +92,15 @@ public class DogControllerTest {
                 .statusCode(201);
     }
 
-    @DataProvider(name = "dogToDelete")
-    public Object[][] shouldSetIdForDogToBeDeleted() {
-        return new Object[][]{
-                {"id", 2}
-        };
-    }
-
-    @Test(dataProvider = "shouldSetIdForDogToBeDeleted")
-    public void shouldDeleteDogById(String paramName, int id) {
-        given()
-                .pathParam(paramName, id)
-                .when()
-                .delete("/dog/{id}")
-                .then()
-                .statusCode(200);
-
-    }
-
-    @Test(dataProvider = "shouldSetFirstDogsId")
+    @Test(dataProvider = "firstId")
     public void shouldUpdateDogById(String paramName, int id) {
         Dog luhu = new Dog();
         luhu.setId(id);
         luhu.setName("Luhu");
         luhu.setHeight(30);
         luhu.setWeight(10);
+
+
         given()
                 .pathParam(paramName, id)
                 .contentType(ContentType.JSON)
@@ -130,6 +112,35 @@ public class DogControllerTest {
                 .body("name", equalTo("Luhu"))
                 .body("height", equalTo(30))
                 .body("weight", equalTo(10));
+    }
+
+    @DataProvider(name = "dogsIdToDelete")
+    public Object[][] shouldSetIdForDogToBeDeleted() {
+        return new Object[][]{
+                {"id", 3}
+        };
+    }
+
+    @Test(dataProvider = "dogsIdToDelete")
+    public void shouldDeleteDogById(String paramName, int id) {
+        Dog dog = new Dog();
+        dog.setId(id);
+        dog.setName("Temp");
+        dog.setHeight(40);
+        dog.setWeight(20);
+        given()
+                .contentType(ContentType.JSON)
+                .body(dog)
+                .when()
+                .post("/dog");
+
+        given()
+                .pathParam(paramName, id)
+                .when()
+                .delete("/dog/{id}")
+                .then()
+                .statusCode(200);
+
     }
 
 }

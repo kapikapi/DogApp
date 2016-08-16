@@ -2,7 +2,7 @@ package com.epam.dog.controller;
 
 import com.epam.dog.controller.vo.Dog;
 import com.epam.dog.dao.DogDAO;
-import com.epam.dog.dao.DogHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,12 @@ import java.util.Map;
 @Controller
 public class DogController {
 
-    private final DogDAO dogDAO = new DogHandler();
+    private final DogDAO dogDAO;
+
+    @Autowired
+    public DogController(DogDAO dogDAO) {
+        this.dogDAO = dogDAO;
+    }
 
     @RequestMapping(value = "/dog", method = RequestMethod.GET)
     public ResponseEntity<List<Dog>> getAllDogs() {
