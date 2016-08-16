@@ -4,12 +4,6 @@
 
 <web-app>
     <display-name>Dog World Application</display-name>
-
-    <!--<servlet>-->
-        <!--<servlet-name>MainServlet</servlet-name>-->
-        <!--<servlet-class>com.epam.dog.MainServlet</servlet-class>-->
-    <!--</servlet>-->
-
     <servlet>
         <servlet-name>mvc-dispatcher</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>

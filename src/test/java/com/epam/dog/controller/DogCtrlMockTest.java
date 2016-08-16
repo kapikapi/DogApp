@@ -2,17 +2,15 @@ package com.epam.dog.controller;
 
 import com.epam.dog.controller.vo.Dog;
 import com.epam.dog.dao.DogHandler;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Test;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,9 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-@WebAppConfiguration
+@ContextConfiguration("file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml")
 public class DogCtrlMockTest {
 
     private MockMvc mvc;
@@ -33,10 +29,11 @@ public class DogCtrlMockTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         mvc = MockMvcBuilders.standaloneSetup(new DogController(dogDAO)).build();
+        System.out.println(mvc);
     }
 
     @Test
-    public void shouldSaveDog() {
+    public void shouldSaveDog() throws Exception {
         Dog newDog = new Dog();
         int id = 1;
         newDog.setId(id);
@@ -44,14 +41,16 @@ public class DogCtrlMockTest {
         newDog.setHeight(50);
         newDog.setWeight(15);
 
+        final ObjectMapper mapper = new ObjectMapper();
+        final String jsonDog = mapper.writeValueAsString(newDog);
+
         when(dogDAO.saveDog(newDog)).thenReturn(id);
 
-        try {
-            mvc.perform(post("/dog").contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isCreated());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        mvc.perform(post("/dog")
+                .content(jsonDog)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
     }
 
     @Test
@@ -67,10 +66,9 @@ public class DogCtrlMockTest {
         try {
             mvc.perform(get("/dog/2"))
                     .andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(jsonPath("$.2.name").value("Doge"))
-                    .andExpect(jsonPath("$.2.height").value("55"))
-                    .andExpect(jsonPath("$.2.weight").value("13"));
+                    .andExpect(jsonPath("$.name").value("Doge"))
+                    .andExpect(jsonPath("$.height").value(55))
+                    .andExpect(jsonPath("$.weight").value(13));
         } catch (Exception e) {
             e.printStackTrace();
         }

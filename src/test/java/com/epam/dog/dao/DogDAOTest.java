@@ -1,8 +1,9 @@
 package com.epam.dog.dao;
 
 import com.epam.dog.controller.vo.Dog;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +16,7 @@ public class DogDAOTest {
     private Map<Integer, Dog> dogExpectedMap;
     private DogHandler dogHandler = new DogHandler();
 
-    @Before
+    @BeforeSuite
     public void init() {
         dogExpectedMap = new HashMap<>();
         Dog expectedDog = new Dog();
