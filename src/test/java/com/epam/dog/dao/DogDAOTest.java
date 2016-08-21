@@ -1,36 +1,30 @@
 package com.epam.dog.dao;
 
 import com.epam.dog.controller.vo.Dog;
-
+import com.epam.dog.controller.vo.DogDto;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class DogDAOTest {
     private Map<Integer, Dog> dogExpectedMap;
-    private DogHandler dogHandler = new DogHandler();
+    private InMemoryDao inMemoryDao = new InMemoryDao();
 
     @BeforeSuite
     public void init() {
-        dogExpectedMap = new HashMap<>();
-        Dog expectedDog = new Dog();
-        expectedDog.setId(1);
-        expectedDog.setName("Aqua");
-        expectedDog.setHeight(45);
-        expectedDog.setWeight(10);
+        dogExpectedMap = new ConcurrentHashMap<>();
+        Dog expectedDog = new Dog(1, "Aqua", 45, 10);
         dogExpectedMap.put(expectedDog.getId(), expectedDog);
     }
 
     @Test
     public void shouldReturnAllDogs() {
 
-        Map<Integer, Dog> dogActualMap = dogHandler.getAllDogs();
+        Map<Integer, Dog> dogActualMap = inMemoryDao.getAllDogs();
         assertEquals(1, dogActualMap.size());
         assertEquals(dogExpectedMap.get(1).getName(), dogActualMap.get(1).getName());
         assertEquals(dogExpectedMap.get(1).getHeight(), dogActualMap.get(1).getHeight());
@@ -39,33 +33,44 @@ public class DogDAOTest {
 
     @Test
     public void shouldSaveSpecifiedDog() {
-        int sizeBefore = dogHandler.getAllDogs().size();
-        Dog newDog = new Dog();
-        int id = dogHandler.getAllDogs().size() + 1;
-        newDog.setId(id);
+        int sizeBefore = inMemoryDao.getAllDogs().size();
+        DogDto newDog = new DogDto();
+//        int id = inMemoryDao.getAllDogs().size() + 1;
+//        newDog.setId(id);
         newDog.setName("Shiny");
         newDog.setHeight(70);
         newDog.setWeight(35);
-        dogExpectedMap.put(newDog.getId(), newDog);
-        dogHandler.saveDog(newDog);
-        assertEquals(sizeBefore + 1, dogHandler.getAllDogs().size());
-        assertTrue(dogHandler.getAllDogs().containsKey(id));
-        assertTrue(dogHandler.getAllDogs().containsValue(newDog));
-        assertEquals(dogExpectedMap.get(id), dogHandler.getAllDogs().get(id));
-
+        int id = inMemoryDao.saveDog(newDog);
+        Dog dog = new Dog(id, newDog.getName(), newDog.getHeight(), newDog.getWeight());
+        dogExpectedMap.put(id, dog);
+        System.out.println(id);
+        assertEquals(sizeBefore + 1, inMemoryDao.getAllDogs().size());
+        assertTrue(inMemoryDao.getAllDogs().containsKey(id));
+//        assertTrue(inMemoryDao.getAllDogs().containsValue(dog));
+        Dog expectedDog = dogExpectedMap.get(dog.getId());
+        Dog actualDog = inMemoryDao.getAllDogs().get(dog.getId());
+        assertEquals(expectedDog.getId(), actualDog.getId());
+        assertEquals(expectedDog.getName(), actualDog.getName());
+        assertEquals(expectedDog.getHeight(), actualDog.getHeight());
+        assertEquals(expectedDog.getWeight(), actualDog.getWeight());
     }
 
     @Test
     public void shouldReturnDogById() {
-        Dog expectedDog = new Dog();
-        int id = dogHandler.getAllDogs().size() + 1;
-        expectedDog.setId(id);
-        expectedDog.setName("Tiny");
-        expectedDog.setHeight(20);
-        expectedDog.setWeight(5);
-        dogHandler.saveDog(expectedDog);
-        Dog actualDog = dogHandler.getDogById(id);
-        assertEquals(expectedDog, actualDog);
+        DogDto dog = new DogDto();
+//        int id = inMemoryDao.getAllDogs().size() + 1;
+//        dog.setId(id);
+        dog.setName("Tiny");
+        dog.setHeight(20);
+        dog.setWeight(5);
+
+        int id = inMemoryDao.saveDog(dog);
+        Dog expectedDog = new Dog(id, dog.getName(), dog.getHeight(), dog.getWeight());
+        Dog actualDog = inMemoryDao.getDogById(id);
+        assertEquals(expectedDog.getId(), actualDog.getId());
+        assertEquals(expectedDog.getName(), actualDog.getName());
+        assertEquals(expectedDog.getHeight(), actualDog.getHeight());
+        assertEquals(expectedDog.getWeight(), actualDog.getWeight());
     }
 
     @Test
@@ -75,28 +80,15 @@ public class DogDAOTest {
     }
 
     private void shouldRemoveDogById(int id) {
-        int sizeBefore = dogHandler.getAllDogs().size();
-        DogHandler stateBefore = dogHandler;
-        if (dogHandler.hasDog(id)) {
-            dogHandler.freeDogById(id);
-            assertEquals(sizeBefore - 1, dogHandler.getAllDogs().size());
-            assertFalse(dogHandler.getAllDogs().containsKey(id));
+        int sizeBefore = inMemoryDao.getAllDogs().size();
+        InMemoryDao stateBefore = inMemoryDao;
+        if (inMemoryDao.hasDog(id)) {
+            inMemoryDao.freeDogById(id);
+            assertEquals(sizeBefore - 1, inMemoryDao.getAllDogs().size());
+            assertFalse(inMemoryDao.getAllDogs().containsKey(id));
         } else {
-            assertEquals(stateBefore, dogHandler);
+            assertEquals(stateBefore, inMemoryDao);
         }
-    }
-
-    @Test
-    public void shouldReturnIfDogExistsById() {
-        Dog lucky = new Dog();
-        int id = dogHandler.getAllDogs().size() + 1;
-        lucky.setId(id);
-        lucky.setName("Lucky");
-        lucky.setHeight(30);
-        lucky.setWeight(10);
-        dogHandler.saveDog(lucky);
-        assertTrue(dogHandler.hasDog(id));
-        assertFalse(dogHandler.hasDog(id + 1));
     }
 
 }

@@ -1,8 +1,9 @@
 package com.epam.dog.controller;
 
 import com.epam.dog.controller.vo.Dog;
+import com.epam.dog.controller.vo.DogDto;
 import com.epam.dog.dao.DogDAO;
-import com.epam.dog.dao.DogHandler;
+import com.epam.dog.dao.InMemoryDao;
 import io.restassured.http.ContentType;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
@@ -11,6 +12,8 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static io.qala.datagen.RandomShortApi.english;
+import static io.qala.datagen.RandomShortApi.integer;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -21,9 +24,19 @@ public class DogControllerTest {
 
     @BeforeSuite
     public void shouldSetDogsInitialData() {
-        DogDAO dogDAO = new DogHandler();
+        DogDAO dogDAO = new InMemoryDao();
         dogsMap = dogDAO.getAllDogs();
     }
+
+    private DogDto setRandomDogDto() {
+
+        DogDto dog = new DogDto();
+        dog.setName(english(10));
+        dog.setHeight(integer(20, 100));
+        dog.setWeight(integer(3, 70));
+        return dog;
+    }
+
 
     @DataProvider(name = "firstId")
     public static Object[][] shouldSetFirstDogsId() {
@@ -57,6 +70,7 @@ public class DogControllerTest {
             dogHeights.add(dog.getHeight());
             dogWeights.add(dog.getWeight());
         }
+
         given().
                 when().
                 get("/dog").
@@ -71,18 +85,14 @@ public class DogControllerTest {
 
     @DataProvider(name = "newDog")
     public Object[][] shouldSetNewDogData() {
-        Dog hamilton = new Dog();
-        hamilton.setId(2);
-        hamilton.setName("Hamilton");
-        hamilton.setHeight(50);
-        hamilton.setWeight(15);
+        DogDto hamilton = setRandomDogDto();
         return new Object[][]{
                 {"dog", hamilton}
         };
     }
 
     @Test(dataProvider = "newDog")
-    public void shouldSaveSpecifiedDog(String paramName, Dog newDog) {
+    public void shouldSaveSpecifiedDog(String paramName, DogDto newDog) {
         given()
                 .contentType(ContentType.JSON)
                 .body(newDog)
@@ -94,13 +104,7 @@ public class DogControllerTest {
 
     @Test(dataProvider = "firstId")
     public void shouldUpdateDogById(String paramName, int id) {
-        Dog luhu = new Dog();
-        luhu.setId(id);
-        luhu.setName("Luhu");
-        luhu.setHeight(30);
-        luhu.setWeight(10);
-
-
+        DogDto luhu = setRandomDogDto();
         given()
                 .pathParam(paramName, id)
                 .contentType(ContentType.JSON)
@@ -109,9 +113,9 @@ public class DogControllerTest {
                 .put("/dog/{id}")
                 .then()
                 .statusCode(200)
-                .body("name", equalTo("Luhu"))
-                .body("height", equalTo(30))
-                .body("weight", equalTo(10));
+                .body("name", equalTo(luhu.getName()))
+                .body("height", equalTo(luhu.getHeight()))
+                .body("weight", equalTo(luhu.getWeight()));
     }
 
     @DataProvider(name = "dogsIdToDelete")
@@ -123,11 +127,8 @@ public class DogControllerTest {
 
     @Test(dataProvider = "dogsIdToDelete")
     public void shouldDeleteDogById(String paramName, int id) {
-        Dog dog = new Dog();
-        dog.setId(id);
-        dog.setName("Temp");
-        dog.setHeight(40);
-        dog.setWeight(20);
+        DogDto dog = setRandomDogDto();
+
         given()
                 .contentType(ContentType.JSON)
                 .body(dog)
@@ -140,7 +141,6 @@ public class DogControllerTest {
                 .delete("/dog/{id}")
                 .then()
                 .statusCode(200);
-
     }
 
 }

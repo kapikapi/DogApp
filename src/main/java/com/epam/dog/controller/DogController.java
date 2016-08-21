@@ -1,6 +1,7 @@
 package com.epam.dog.controller;
 
 import com.epam.dog.controller.vo.Dog;
+import com.epam.dog.controller.vo.DogDto;
 import com.epam.dog.dao.DogDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -22,6 +23,14 @@ public class DogController {
 
     private final DogDAO dogDAO;
 
+    private DogDto getDogDto(Dog dog) {
+        DogDto dogDto = new DogDto();
+        dogDto.setName(dog.getName());
+        dogDto.setHeight(dog.getHeight());
+        dogDto.setWeight(dog.getWeight());
+        return dogDto;
+    }
+
     @Autowired
     public DogController(DogDAO dogDAO) {
         this.dogDAO = dogDAO;
@@ -30,7 +39,7 @@ public class DogController {
     @RequestMapping(value = "/dog", method = RequestMethod.GET)
     public ResponseEntity<List<Dog>> getAllDogs() {
         Map<Integer, Dog> dogsMap = dogDAO.getAllDogs();
-        if(dogsMap.isEmpty()){
+        if (dogsMap.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             List<Dog> dogList = new ArrayList<>(dogsMap.values());
@@ -39,30 +48,32 @@ public class DogController {
     }
 
     @RequestMapping(value = "/dog/{id}", method = RequestMethod.GET)
-    public ResponseEntity<Dog> getDog(@PathVariable("id") int id) {
+    public ResponseEntity<DogDto> getDog(@PathVariable("id") int id) {
 
         Dog dog = dogDAO.getDogById(id);
+
         if (dog == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(dog, HttpStatus.OK);
+        DogDto dogDto = getDogDto(dog);
+        return new ResponseEntity<>(dogDto, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/dog", method = RequestMethod.POST)
-    public ResponseEntity<Dog> createDog(@RequestBody Dog dog, UriComponentsBuilder ucBuilder) {
-        if (dogDAO.hasDog(dog.getId())) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        } else {
-            dogDAO.saveDog(dog);
+    public ResponseEntity<DogDto> createDog(@RequestBody DogDto dog, UriComponentsBuilder ucBuilder) {
+//        if (dogDAO.hasDog(dog.getId())) {
+//            dog.setId(dogDAO.getAllDogs().size());
+//        }
+        int id = dogDAO.saveDog(dog);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(ucBuilder.path("/dog/{id}").buildAndExpand(dog.getId()).toUri());
-            return new ResponseEntity<>(dog, headers, HttpStatus.CREATED);
-        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(ucBuilder.path("/dog/{id}").buildAndExpand(id).toUri());
+        return new ResponseEntity<>(dog, headers, HttpStatus.CREATED);
+
     }
 
     @RequestMapping(value = "/dog/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<Dog> updateDog(@PathVariable("id") int id, @RequestBody Dog dog) {
+    public ResponseEntity<DogDto> updateDog(@PathVariable("id") int id, @RequestBody DogDto dog) {
         if (!dogDAO.hasDog(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
@@ -70,16 +81,18 @@ public class DogController {
             updatedDog.setName(dog.getName());
             updatedDog.setHeight(dog.getHeight());
             updatedDog.setWeight(dog.getWeight());
-            return new ResponseEntity<>(updatedDog, HttpStatus.OK);
+            return new ResponseEntity<>(dog, HttpStatus.OK);
         }
     }
 
     @RequestMapping(value = "/dog/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<Dog> deleteDog(@PathVariable("id") int id) {
+    public ResponseEntity<DogDto> deleteDog(@PathVariable("id") int id) {
         if (!dogDAO.hasDog(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            return new ResponseEntity<>(dogDAO.freeDogById(id), HttpStatus.OK);
+            Dog dog = dogDAO.freeDogById(id);
+            DogDto dogDto = getDogDto(dog);
+            return new ResponseEntity<>(dogDto, HttpStatus.OK);
         }
     }
 }
