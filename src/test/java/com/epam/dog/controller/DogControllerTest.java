@@ -135,6 +135,9 @@ public class DogControllerTest {
                 .when()
                 .post("/dog");
 
+        Dog doge = dogsMap.get(dogsMap.size());
+        System.out.println(doge.getName());
+
         given()
                 .pathParam(paramName, id)
                 .when()

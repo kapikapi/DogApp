@@ -1,18 +1,22 @@
 package com.epam.dog.controller.vo;
 
-public class Dog {
+import javax.persistence.*;
 
-    private final int id;
+@Entity
+//@org.hibernate.annotations.Entity(dynamicUpdate = true)
+@Table(name = "DOGS", uniqueConstraints = {@UniqueConstraint(columnNames = "ID")})
+public class DogEntity {
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private int id;
+
+    @Column(name = "DOG_NAME", nullable = false, length = 200)
     private String name;
+    @Column(name = "HEIGHT")
     private int height;
+    @Column(name = "WEIGHT")
     private int weight;
-
-    public Dog(int id, String name, int height, int weight) {
-        this.id = id;
-        this.name = name;
-        this.height = height;
-        this.weight = weight;
-    }
 
     public int getId() {
         return id;
@@ -45,9 +49,4 @@ public class Dog {
     public void setWeight(int weight) {
         this.weight = weight;
     }
-
-//    @Override
-//    public boolean equals(Object obj) {
-//        return obj != null && (obj == this || obj instanceof Dog && ((Dog) obj).getId() == this.getId());
-//    }
 }

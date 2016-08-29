@@ -2,7 +2,7 @@ package com.epam.dog.controller;
 
 import com.epam.dog.controller.vo.Dog;
 import com.epam.dog.controller.vo.DogDto;
-import com.epam.dog.dao.DogDAO;
+import com.epam.dog.dao.HibernateDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,7 +21,8 @@ import java.util.Map;
 @Controller
 public class DogController {
 
-    private final DogDAO dogDAO;
+//    private final DogDAO dogDAO;
+    private final HibernateDao dogDAO;
 
     private DogDto getDogDto(Dog dog) {
         DogDto dogDto = new DogDto();
@@ -31,8 +32,13 @@ public class DogController {
         return dogDto;
     }
 
+//    @Autowired
+//    public DogController(DogDAO dogDAO) {
+//        this.dogDAO = dogDAO;
+//    }
+
     @Autowired
-    public DogController(DogDAO dogDAO) {
+    public DogController(HibernateDao dogDAO) {
         this.dogDAO = dogDAO;
     }
 

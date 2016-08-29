@@ -1,7 +1,7 @@
 package com.epam.dog.controller;
 
 import com.epam.dog.controller.vo.Dog;
-import com.epam.dog.dao.InMemoryDao;
+import com.epam.dog.dao.HibernateDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -23,8 +23,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DogCtrlMockTest {
 
     private MockMvc mvc;
+//    @Mock
+//    public InMemoryDao dogDAO;
     @Mock
-    public InMemoryDao dogDAO;
+    public HibernateDao dogDAO;
 
     @BeforeSuite
     public void setup() {
