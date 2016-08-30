@@ -11,4 +11,5 @@ public interface DogDAO {
     Dog getDogById(int id);
     Dog freeDogById(int id);
     boolean hasDog(int id);
+    Dog editDogById(int id, DogDto dogDto);
 }

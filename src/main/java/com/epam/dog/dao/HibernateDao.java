@@ -19,9 +19,10 @@ public class HibernateDao implements DogDAO {
 
     @Override
     public Map<Integer, Dog> getAllDogs() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = HibernateUtil.getSession();
         session.beginTransaction();
         List<DogEntity> result = session.createQuery("from DogEntity").list();
+        session.getTransaction().commit();
         Map<Integer, Dog> dogsMap = new ConcurrentHashMap<>();
         for (DogEntity dog : result) {
            dogsMap.put(dog.getId(), dogEntityToDog(dog));
@@ -31,7 +32,7 @@ public class HibernateDao implements DogDAO {
 
     @Override
     public int saveDog(DogDto dogDto) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = HibernateUtil.getSession();
         session.beginTransaction();
         DogEntity dogEntity = new DogEntity();
         dogEntity.setName(dogDto.getName());
@@ -39,35 +40,50 @@ public class HibernateDao implements DogDAO {
         dogEntity.setWeight(dogDto.getWeight());
         session.save(dogEntity);
         session.getTransaction().commit();
-        HibernateUtil.shutdown();
+//        HibernateUtil.shutdown();
 
         return dogEntity.getId();
     }
 
     @Override
     public Dog getDogById(int id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = HibernateUtil.getSession();
         session.beginTransaction();
 //        Map<Integer, Dog> dogMap = getAllDogs();
-        DogEntity dog = (DogEntity) session.get(Dog.class, id);
+        DogEntity dog = (DogEntity) session.get(DogEntity.class, id);
         session.getTransaction().commit();
-        HibernateUtil.shutdown();
-        return dogEntityToDog(dog);
+//        HibernateUtil.shutdown();
+        return dog != null ? dogEntityToDog(dog) : null;
     }
 
     @Override
     public Dog freeDogById(int id) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
+        Session session = HibernateUtil.getSession();
         session.beginTransaction();
-        DogEntity dog = (DogEntity) session.get(Dog.class, id);
+        DogEntity dog = (DogEntity) session.get(DogEntity.class, id);
         session.delete(dog);
         session.getTransaction().commit();
-        HibernateUtil.shutdown();
+//        HibernateUtil.shutdown();
         return dogEntityToDog(dog);
     }
 
     @Override
     public boolean hasDog(int id) {
         return getDogById(id) != null;
+    }
+
+    @Override
+    public Dog editDogById(int id, DogDto dogDto) {
+        Session session = HibernateUtil.getSession();
+        session.beginTransaction();
+        DogEntity dog = (DogEntity) session.get(DogEntity.class, id);
+
+        dog.setName(dogDto.getName());
+        dog.setHeight(dogDto.getHeight());
+        dog.setWeight(dogDto.getWeight());
+        session.update(dog);
+        session.getTransaction().commit();
+
+        return dogEntityToDog(dog);
     }
 }

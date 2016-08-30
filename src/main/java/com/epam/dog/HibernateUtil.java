@@ -1,26 +1,29 @@
 package com.epam.dog;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
 public class HibernateUtil {
-    private static SessionFactory sessionFactory = buildSessionFactory();
 
-    private static SessionFactory buildSessionFactory()
+    private static Session session;
+
+    private static Session buildSession()
     {
         try
         {
-            if (sessionFactory == null)
+            if (session == null)
             {
                 Configuration configuration = new Configuration().configure(HibernateUtil.class.getResource("/hibernate.config.xml"));
                 StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();
                 serviceRegistryBuilder.applySettings(configuration.getProperties());
                 ServiceRegistry serviceRegistry = serviceRegistryBuilder.build();
-                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+                SessionFactory sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+                session = sessionFactory.openSession();
             }
-            return sessionFactory;
+            return session;
         } catch (Throwable ex)
         {
             System.err.println("Initial SessionFactory creation failed." + ex);
@@ -28,14 +31,18 @@ public class HibernateUtil {
         }
     }
 
-    public static SessionFactory getSessionFactory()
+    public static Session getSession()
     {
-        return sessionFactory;
+        if (session != null) {
+            return session;
+        } else {
+            return buildSession();
+        }
     }
 
     public static void shutdown()
     {
-        getSessionFactory().close();
+        session.close();
     }
 
 }

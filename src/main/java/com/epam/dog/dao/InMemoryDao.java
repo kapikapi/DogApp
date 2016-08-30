@@ -42,4 +42,11 @@ public class InMemoryDao implements DogDAO {
     public boolean hasDog(int id) {
         return dogs.containsKey(id);
     }
+
+    @Override
+    public Dog editDogById(int id, DogDto dogDto) {
+        Dog dog = new Dog(id, dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
+        dogs.put(id, dog);
+        return dog;
+    }
 }
