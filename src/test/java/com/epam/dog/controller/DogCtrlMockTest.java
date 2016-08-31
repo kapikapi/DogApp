@@ -1,5 +1,6 @@
 package com.epam.dog.controller;
 
+import com.epam.dog.DogsHandler;
 import com.epam.dog.controller.vo.Dog;
 import com.epam.dog.controller.vo.DogDto;
 import com.epam.dog.dao.HibernateDao;
@@ -14,8 +15,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import static io.qala.datagen.RandomShortApi.english;
-import static io.qala.datagen.RandomShortApi.integer;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -47,18 +46,9 @@ public class DogCtrlMockTest {
 
     }
 
-    private DogDto setRandomDogDto() {
-
-        DogDto dog = new DogDto();
-        dog.setName(english(10));
-        dog.setHeight(integer(20, 100));
-        dog.setWeight(integer(3, 70));
-        return dog;
-    }
-
     @Test
     public void shouldSaveDog() throws Exception {
-        DogDto dogDto = setRandomDogDto();
+        DogDto dogDto = DogsHandler.setRandomDogDto();
         Dog newDog = new Dog(1, dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
 
         saveDog(newDog)
@@ -68,7 +58,7 @@ public class DogCtrlMockTest {
 
     @Test
     public void shouldGetDogById() throws Exception {
-        DogDto dogDto = setRandomDogDto();
+        DogDto dogDto = DogsHandler.setRandomDogDto();
         Dog newDog = new Dog(2, dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
         saveDog(newDog);
         mvc.perform(get("/dog/2"))

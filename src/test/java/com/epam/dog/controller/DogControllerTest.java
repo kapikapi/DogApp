@@ -1,5 +1,6 @@
 package com.epam.dog.controller;
 
+import com.epam.dog.DogsHandler;
 import com.epam.dog.controller.vo.Dog;
 import com.epam.dog.controller.vo.DogDto;
 import com.epam.dog.dao.DogDAO;
@@ -12,8 +13,6 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static io.qala.datagen.RandomShortApi.english;
-import static io.qala.datagen.RandomShortApi.integer;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -28,14 +27,6 @@ public class DogControllerTest {
         dogsMap = dogDAO.getAllDogs();
     }
 
-    private DogDto setRandomDogDto() {
-
-        DogDto dog = new DogDto();
-        dog.setName(english(10));
-        dog.setHeight(integer(20, 100));
-        dog.setWeight(integer(3, 70));
-        return dog;
-    }
 
 
     @DataProvider(name = "firstId")
@@ -85,7 +76,7 @@ public class DogControllerTest {
 
     @DataProvider(name = "newDog")
     public Object[][] shouldSetNewDogData() {
-        DogDto hamilton = setRandomDogDto();
+        DogDto hamilton = DogsHandler.setRandomDogDto();
         return new Object[][]{
                 {"dog", hamilton}
         };
@@ -104,7 +95,7 @@ public class DogControllerTest {
 
     @Test(dataProvider = "firstId")
     public void shouldUpdateDogById(String paramName, int id) {
-        DogDto luhu = setRandomDogDto();
+        DogDto luhu = DogsHandler.setRandomDogDto();
         given()
                 .pathParam(paramName, id)
                 .contentType(ContentType.JSON)
@@ -127,7 +118,7 @@ public class DogControllerTest {
 
     @Test(dataProvider = "dogsIdToDelete")
     public void shouldDeleteDogById(String paramName, int id) {
-        DogDto dog = setRandomDogDto();
+        DogDto dog = DogsHandler.setRandomDogDto();
 
         given()
                 .contentType(ContentType.JSON)
@@ -135,8 +126,7 @@ public class DogControllerTest {
                 .when()
                 .post("/dog");
 
-        Dog doge = dogsMap.get(dogsMap.size());
-        System.out.println(doge.getName());
+//        Dog doge = dogsMap.get(dogsMap.size());
 
         given()
                 .pathParam(paramName, id)

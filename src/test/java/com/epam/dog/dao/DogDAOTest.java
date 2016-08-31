@@ -1,5 +1,6 @@
 package com.epam.dog.dao;
 
+import com.epam.dog.DogsHandler;
 import com.epam.dog.controller.vo.Dog;
 import com.epam.dog.controller.vo.DogDto;
 import org.testng.annotations.BeforeSuite;
@@ -16,19 +17,10 @@ public class DogDAOTest {
     private Map<Integer, Dog> dogExpectedMap;
     private InMemoryDao inMemoryDao = new InMemoryDao();
 
-    private DogDto setRandomDogDto() {
-
-        DogDto dog = new DogDto();
-        dog.setName(english(10));
-        dog.setHeight(integer(20, 100));
-        dog.setWeight(integer(3, 70));
-        return dog;
-    }
-
     @BeforeSuite
     public void init() {
         dogExpectedMap = new ConcurrentHashMap<>();
-        DogDto randomDog = setRandomDogDto();
+        DogDto randomDog = DogsHandler.setRandomDogDto();
         Dog expectedDog = new Dog(1, randomDog.getName(), randomDog.getHeight(), randomDog.getWeight());
         dogExpectedMap.put(expectedDog.getId(), expectedDog);
     }
@@ -46,7 +38,7 @@ public class DogDAOTest {
     @Test
     public void shouldSaveSpecifiedDog() {
         int sizeBefore = inMemoryDao.getAllDogs().size();
-        DogDto newDog = setRandomDogDto();
+        DogDto newDog = DogsHandler.setRandomDogDto();
 //        int id = inMemoryDao.getAllDogs().size() + 1;
 //        newDog.setId(id);
 
@@ -67,7 +59,7 @@ public class DogDAOTest {
 
     @Test
     public void shouldReturnDogById() {
-        DogDto dog = setRandomDogDto();
+        DogDto dog = DogsHandler.setRandomDogDto();
 
         int id = inMemoryDao.saveDog(dog.getName(), dog.getHeight(), dog.getWeight());
         Dog expectedDog = new Dog(id, dog.getName(), dog.getHeight(), dog.getWeight());

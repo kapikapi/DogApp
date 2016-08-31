@@ -1,5 +1,6 @@
 package com.epam.dog.dao;
 
+import com.epam.dog.DogsHandler;
 import com.epam.dog.controller.vo.Dog;
 import com.epam.dog.controller.vo.DogDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +22,8 @@ public class DogDaoHibernateTest {
     @Autowired
     DogDAO dogDAO = new HibernateDao();
 
-    private DogDto setRandomDogDto() {
-        DogDto dog = new DogDto();
-        dog.setName(english(10));
-        dog.setHeight(integer(20, 100));
-        dog.setWeight(integer(3, 70));
-        return dog;
-    }
-
     private Dog saveNewDog() {
-        DogDto newDog = setRandomDogDto();
+        DogDto newDog = DogsHandler.setRandomDogDto();
         int id = dogDAO.saveDog(newDog.getName(), newDog.getHeight(), newDog.getWeight());
         return new Dog(id, newDog.getName(), newDog.getHeight(), newDog.getWeight());
     }
@@ -61,7 +54,7 @@ public class DogDaoHibernateTest {
 
     @org.testng.annotations.Test
     public void shouldReturnDogById() {
-        DogDto dogDto = setRandomDogDto();
+        DogDto dogDto = DogsHandler.setRandomDogDto();
         int id = dogDAO.saveDog(dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
         Dog actualDog = dogDAO.getDogById(id);
         assertEquals(id, actualDog.getId());
