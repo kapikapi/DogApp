@@ -1,6 +1,7 @@
 package com.epam.dog.controller;
 
 import com.epam.dog.controller.vo.Dog;
+import com.epam.dog.controller.vo.DogDto;
 import com.epam.dog.dao.HibernateDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mockito.Mock;
@@ -13,6 +14,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
+import static io.qala.datagen.RandomShortApi.english;
+import static io.qala.datagen.RandomShortApi.integer;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -44,9 +47,19 @@ public class DogCtrlMockTest {
 
     }
 
+    private DogDto setRandomDogDto() {
+
+        DogDto dog = new DogDto();
+        dog.setName(english(10));
+        dog.setHeight(integer(20, 100));
+        dog.setWeight(integer(3, 70));
+        return dog;
+    }
+
     @Test
     public void shouldSaveDog() throws Exception {
-        Dog newDog = new Dog(1, "Fabulous", 50, 15);
+        DogDto dogDto = setRandomDogDto();
+        Dog newDog = new Dog(1, dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
 
         saveDog(newDog)
                 .andExpect(status().isCreated());
@@ -55,13 +68,14 @@ public class DogCtrlMockTest {
 
     @Test
     public void shouldGetDogById() throws Exception {
-//        Dog newDog = new Dog(2, "Doge", 55, 13);
-
+        DogDto dogDto = setRandomDogDto();
+        Dog newDog = new Dog(2, dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
+        saveDog(newDog);
         mvc.perform(get("/dog/2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Doge"))
-                .andExpect(jsonPath("$.height").value(55))
-                .andExpect(jsonPath("$.weight").value(13));
+                .andExpect(jsonPath("$.name").value(newDog.getName()))
+                .andExpect(jsonPath("$.height").value(newDog.getHeight()))
+                .andExpect(jsonPath("$.weight").value(newDog.getWeight()));
 
     }
 

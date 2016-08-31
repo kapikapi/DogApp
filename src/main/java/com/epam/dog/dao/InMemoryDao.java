@@ -1,7 +1,6 @@
 package com.epam.dog.dao;
 
 import com.epam.dog.controller.vo.Dog;
-import com.epam.dog.controller.vo.DogDto;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,8 +21,8 @@ public class InMemoryDao implements DogDAO {
     }
 
     @Override
-    public int saveDog(DogDto dogDto) {
-        Dog dog = new Dog(dogs.size() + 1, dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
+    public int saveDog(String name, int height, int weight) {
+        Dog dog = new Dog(dogs.size() + 1, name, height, weight);
         dogs.put(dog.getId(), dog);
         return dog.getId();
     }
@@ -44,8 +43,8 @@ public class InMemoryDao implements DogDAO {
     }
 
     @Override
-    public Dog editDogById(int id, DogDto dogDto) {
-        Dog dog = new Dog(id, dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
+    public Dog editDogById(int id, String name, int height,int weight) {
+        Dog dog = new Dog(id, name, height, weight);
         dogs.put(id, dog);
         return dog;
     }

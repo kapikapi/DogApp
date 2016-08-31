@@ -2,7 +2,6 @@ package com.epam.dog.dao;
 
 import com.epam.dog.HibernateUtil;
 import com.epam.dog.controller.vo.Dog;
-import com.epam.dog.controller.vo.DogDto;
 import com.epam.dog.controller.vo.DogEntity;
 import org.hibernate.Session;
 
@@ -31,13 +30,13 @@ public class HibernateDao implements DogDAO {
     }
 
     @Override
-    public int saveDog(DogDto dogDto) {
+    public int saveDog(String name, int height,int weight) {
         Session session = HibernateUtil.getSession();
         session.beginTransaction();
         DogEntity dogEntity = new DogEntity();
-        dogEntity.setName(dogDto.getName());
-        dogEntity.setHeight(dogDto.getHeight());
-        dogEntity.setWeight(dogDto.getWeight());
+        dogEntity.setName(name);
+        dogEntity.setHeight(height);
+        dogEntity.setWeight(weight);
         session.save(dogEntity);
         session.getTransaction().commit();
 //        HibernateUtil.shutdown();
@@ -73,14 +72,14 @@ public class HibernateDao implements DogDAO {
     }
 
     @Override
-    public Dog editDogById(int id, DogDto dogDto) {
+    public Dog editDogById(int id, String name, int height,int weight) {
         Session session = HibernateUtil.getSession();
         session.beginTransaction();
         DogEntity dog = (DogEntity) session.get(DogEntity.class, id);
 
-        dog.setName(dogDto.getName());
-        dog.setHeight(dogDto.getHeight());
-        dog.setWeight(dogDto.getWeight());
+        dog.setName(name);
+        dog.setHeight(height);
+        dog.setWeight(weight);
         session.update(dog);
         session.getTransaction().commit();
 

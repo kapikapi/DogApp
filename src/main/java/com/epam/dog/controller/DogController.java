@@ -70,7 +70,7 @@ public class DogController {
 //        if (dogDAO.hasDog(dog.getId())) {
 //            dog.setId(dogDAO.getAllDogs().size());
 //        }
-        int id = dogDAO.saveDog(dog);
+        int id = dogDAO.saveDog(dog.getName(), dog.getHeight(), dog.getWeight());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/dog/{id}").buildAndExpand(id).toUri());
@@ -83,10 +83,7 @@ public class DogController {
         if (!dogDAO.hasDog(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            Dog updatedDog = dogDAO.getDogById(id);
-            updatedDog.setName(dog.getName());
-            updatedDog.setHeight(dog.getHeight());
-            updatedDog.setWeight(dog.getWeight());
+            dogDAO.editDogById(id, dog.getName(), dog.getHeight(), dog.getWeight());
             return new ResponseEntity<>(dog, HttpStatus.OK);
         }
     }

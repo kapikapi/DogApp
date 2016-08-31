@@ -8,16 +8,28 @@ import org.testng.annotations.Test;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static io.qala.datagen.RandomShortApi.english;
+import static io.qala.datagen.RandomShortApi.integer;
 import static org.junit.Assert.*;
 
 public class DogDAOTest {
     private Map<Integer, Dog> dogExpectedMap;
     private InMemoryDao inMemoryDao = new InMemoryDao();
 
+    private DogDto setRandomDogDto() {
+
+        DogDto dog = new DogDto();
+        dog.setName(english(10));
+        dog.setHeight(integer(20, 100));
+        dog.setWeight(integer(3, 70));
+        return dog;
+    }
+
     @BeforeSuite
     public void init() {
         dogExpectedMap = new ConcurrentHashMap<>();
-        Dog expectedDog = new Dog(1, "Aqua", 45, 10);
+        DogDto randomDog = setRandomDogDto();
+        Dog expectedDog = new Dog(1, randomDog.getName(), randomDog.getHeight(), randomDog.getWeight());
         dogExpectedMap.put(expectedDog.getId(), expectedDog);
     }
 
@@ -34,13 +46,11 @@ public class DogDAOTest {
     @Test
     public void shouldSaveSpecifiedDog() {
         int sizeBefore = inMemoryDao.getAllDogs().size();
-        DogDto newDog = new DogDto();
+        DogDto newDog = setRandomDogDto();
 //        int id = inMemoryDao.getAllDogs().size() + 1;
 //        newDog.setId(id);
-        newDog.setName("Shiny");
-        newDog.setHeight(70);
-        newDog.setWeight(35);
-        int id = inMemoryDao.saveDog(newDog);
+
+        int id = inMemoryDao.saveDog(newDog.getName(), newDog.getHeight(), newDog.getWeight());
         Dog dog = new Dog(id, newDog.getName(), newDog.getHeight(), newDog.getWeight());
         dogExpectedMap.put(id, dog);
         System.out.println(id);
@@ -57,14 +67,9 @@ public class DogDAOTest {
 
     @Test
     public void shouldReturnDogById() {
-        DogDto dog = new DogDto();
-//        int id = inMemoryDao.getAllDogs().size() + 1;
-//        dog.setId(id);
-        dog.setName("Tiny");
-        dog.setHeight(20);
-        dog.setWeight(5);
+        DogDto dog = setRandomDogDto();
 
-        int id = inMemoryDao.saveDog(dog);
+        int id = inMemoryDao.saveDog(dog.getName(), dog.getHeight(), dog.getWeight());
         Dog expectedDog = new Dog(id, dog.getName(), dog.getHeight(), dog.getWeight());
         Dog actualDog = inMemoryDao.getDogById(id);
         assertEquals(expectedDog.getId(), actualDog.getId());
