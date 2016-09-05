@@ -24,8 +24,9 @@
         <!-- Drop and re-create the database schema on startup -->
         <property name="hbm2ddl.auto">create</property>
 
-        <!--<mapping resource="hibernate_example/hbm/Book.hbm.xml"/>-->
-        <mapping class="com.epam.dog.controller.vo.DogEntity"/>
+        <!--<mapping class="com.epam.dog.controller.vo.DogEntity"/>-->
+
+        <mapping resource="Dog.hbm.xml"/>
 
     </session-factory>
 

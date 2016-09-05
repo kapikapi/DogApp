@@ -1,18 +1,16 @@
 package com.epam.dog.controller;
 
 import com.epam.dog.DogsHandler;
-import com.epam.dog.controller.vo.Dog;
 import com.epam.dog.controller.vo.DogDto;
+import com.epam.dog.dao.DogDAO;
 import com.epam.dog.dao.HibernateDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,21 +23,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DogCtrlMockTest {
 
     private MockMvc mvc;
-//    @Mock
-//    public InMemoryDao dogDAO;
-    @Mock
-    public HibernateDao dogDAO;
+    public DogDAO dogDAO;
 
-    @BeforeSuite
+    @BeforeTest
     public void setup() {
-        MockitoAnnotations.initMocks(this);
+        dogDAO = new HibernateDao();
         mvc = MockMvcBuilders.standaloneSetup(new DogController(dogDAO)).build();
-        System.out.println(mvc);
     }
 
-    private ResultActions saveDog(Dog dog) throws Exception {
+    private ResultActions saveDog(DogDto dog) throws Exception {
         final ObjectMapper mapper = new ObjectMapper();
         final String jsonDog = mapper.writeValueAsString(dog);
+
         return mvc.perform(post("/dog")
                 .content(jsonDog)
                 .contentType(MediaType.APPLICATION_JSON));
@@ -49,9 +44,7 @@ public class DogCtrlMockTest {
     @Test
     public void shouldSaveDog() throws Exception {
         DogDto dogDto = DogsHandler.setRandomDogDto();
-        Dog newDog = new Dog(1, dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
-
-        saveDog(newDog)
+        saveDog(dogDto)
                 .andExpect(status().isCreated());
 
     }
@@ -59,13 +52,12 @@ public class DogCtrlMockTest {
     @Test
     public void shouldGetDogById() throws Exception {
         DogDto dogDto = DogsHandler.setRandomDogDto();
-        Dog newDog = new Dog(2, dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
-        saveDog(newDog);
-        mvc.perform(get("/dog/2"))
+        ResultActions resultActions = saveDog(dogDto);
+        mvc.perform(get("/dog/3"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(newDog.getName()))
-                .andExpect(jsonPath("$.height").value(newDog.getHeight()))
-                .andExpect(jsonPath("$.weight").value(newDog.getWeight()));
+                .andExpect(jsonPath("$.name").value(dogDto.getName()))
+                .andExpect(jsonPath("$.height").value(dogDto.getHeight()))
+                .andExpect(jsonPath("$.weight").value(dogDto.getWeight()));
 
     }
 
@@ -75,7 +67,10 @@ public class DogCtrlMockTest {
     }
 
     @Test
-    public void shouldUpdateDog() {
+    public void shouldUpdateDog() throws Exception {
+        DogDto dogDto = DogsHandler.setRandomDogDto();
+        saveDog(dogDto);
+        DogDto updatedDog = DogsHandler.setRandomDogDto();
         //TODO
     }
 

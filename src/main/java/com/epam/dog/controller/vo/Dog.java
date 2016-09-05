@@ -2,17 +2,17 @@ package com.epam.dog.controller.vo;
 
 public class Dog {
 
-    private final int id;
+    private int id;
     private String name;
     private int height;
     private int weight;
 
-    public Dog(int id, String name, int height, int weight) {
-        this.id = id;
-        this.name = name;
-        this.height = height;
-        this.weight = weight;
-    }
+//    public Dog(int id, String name, int height, int weight) {
+//        this.id = id;
+//        this.name = name;
+//        this.height = height;
+//        this.weight = weight;
+//    }
 
     public int getId() {
         return id;
@@ -30,9 +30,9 @@ public class Dog {
         return weight;
     }
 
-//    public void setId(int id) {
-//        this.id = id;
-//    }
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public void setName(String name) {
         this.name = name;

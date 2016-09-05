@@ -4,9 +4,9 @@ import com.epam.dog.DogsHandler;
 import com.epam.dog.controller.vo.Dog;
 import com.epam.dog.controller.vo.DogDto;
 import com.epam.dog.dao.DogDAO;
-import com.epam.dog.dao.InMemoryDao;
+import com.epam.dog.dao.HibernateDao;
 import io.restassured.http.ContentType;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -20,10 +20,12 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public class DogControllerTest {
     private Map<Integer, Dog> dogsMap;
+    private DogDAO dogDAO;
 
-    @BeforeSuite
+    @BeforeTest
     public void shouldSetDogsInitialData() {
-        DogDAO dogDAO = new InMemoryDao();
+//        dogDAO = new InMemoryDao();
+        dogDAO = new HibernateDao();
         dogsMap = dogDAO.getAllDogs();
     }
 
@@ -32,7 +34,7 @@ public class DogControllerTest {
     @DataProvider(name = "firstId")
     public static Object[][] shouldSetFirstDogsId() {
         return new Object[][]{
-                {"id", 1}
+                {"id", 2}
         };
     }
 
@@ -56,7 +58,9 @@ public class DogControllerTest {
         ArrayList<String> dogNames = new ArrayList<>();
         ArrayList<Integer> dogHeights = new ArrayList<>();
         ArrayList<Integer> dogWeights = new ArrayList<>();
-        for (Dog dog : dogsMap.values()) {
+        DogDto dogDto = DogsHandler.setRandomDogDto();
+        int id = dogDAO.saveDog(dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
+        for (Dog dog : dogDAO.getAllDogs().values()) {
             dogNames.add(dog.getName());
             dogHeights.add(dog.getHeight());
             dogWeights.add(dog.getWeight());
@@ -69,9 +73,9 @@ public class DogControllerTest {
                 assertThat()
                 .contentType(ContentType.JSON)
                 .statusCode(200)
-                .body("name", contains(dogNames.get(0)))
-                .body("height", contains(dogHeights.get(0)))
-                .body("weight", contains(dogWeights.get(0)));
+                .body("name", contains(dogNames.get(id - 1)))
+                .body("height", contains(dogHeights.get(id - 1)))
+                .body("weight", contains(dogWeights.get(id - 1)));
     }
 
     @DataProvider(name = "newDog")

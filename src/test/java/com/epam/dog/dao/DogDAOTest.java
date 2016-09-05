@@ -9,8 +9,6 @@ import org.testng.annotations.Test;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static io.qala.datagen.RandomShortApi.english;
-import static io.qala.datagen.RandomShortApi.integer;
 import static org.junit.Assert.*;
 
 public class DogDAOTest {
@@ -21,7 +19,11 @@ public class DogDAOTest {
     public void init() {
         dogExpectedMap = new ConcurrentHashMap<>();
         DogDto randomDog = DogsHandler.setRandomDogDto();
-        Dog expectedDog = new Dog(1, randomDog.getName(), randomDog.getHeight(), randomDog.getWeight());
+        Dog expectedDog = new Dog();
+        expectedDog.setId(1);
+        expectedDog.setName(randomDog.getName());
+        expectedDog.setHeight(randomDog.getHeight());
+        expectedDog.setWeight(randomDog.getWeight());
         dogExpectedMap.put(expectedDog.getId(), expectedDog);
     }
 
@@ -43,7 +45,11 @@ public class DogDAOTest {
 //        newDog.setId(id);
 
         int id = inMemoryDao.saveDog(newDog.getName(), newDog.getHeight(), newDog.getWeight());
-        Dog dog = new Dog(id, newDog.getName(), newDog.getHeight(), newDog.getWeight());
+        Dog dog = new Dog();
+        dog.setId(id);
+        dog.setName(newDog.getName());
+        dog.setHeight(newDog.getHeight());
+        dog.setWeight(newDog.getWeight());
         dogExpectedMap.put(id, dog);
         System.out.println(id);
         assertEquals(sizeBefore + 1, inMemoryDao.getAllDogs().size());
@@ -62,7 +68,11 @@ public class DogDAOTest {
         DogDto dog = DogsHandler.setRandomDogDto();
 
         int id = inMemoryDao.saveDog(dog.getName(), dog.getHeight(), dog.getWeight());
-        Dog expectedDog = new Dog(id, dog.getName(), dog.getHeight(), dog.getWeight());
+        Dog expectedDog = new Dog();
+        expectedDog.setId(id);
+        expectedDog.setName(dog.getName());
+        expectedDog.setHeight(dog.getHeight());
+        expectedDog.setWeight(dog.getWeight());
         Dog actualDog = inMemoryDao.getDogById(id);
         assertEquals(expectedDog.getId(), actualDog.getId());
         assertEquals(expectedDog.getName(), actualDog.getName());

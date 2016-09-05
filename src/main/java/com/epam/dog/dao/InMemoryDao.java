@@ -11,8 +11,8 @@ public class InMemoryDao implements DogDAO {
 
     public InMemoryDao() {
         dogs = new ConcurrentHashMap<>();
-        Dog aqua = new Dog(dogs.size() + 1, "Aqua", 45, 10);
-        dogs.put(aqua.getId(), aqua);
+//        Dog aqua = new Dog(dogs.size() + 1, "Aqua", 45, 10);
+//        dogs.put(aqua.getId(), aqua);
     }
 
     @Override
@@ -22,7 +22,11 @@ public class InMemoryDao implements DogDAO {
 
     @Override
     public int saveDog(String name, int height, int weight) {
-        Dog dog = new Dog(dogs.size() + 1, name, height, weight);
+        Dog dog = new Dog();
+        dog.setId(dogs.size() + 1);
+        dog.setName(name);
+        dog.setHeight(height);
+        dog.setWeight(weight);
         dogs.put(dog.getId(), dog);
         return dog.getId();
     }
@@ -44,7 +48,11 @@ public class InMemoryDao implements DogDAO {
 
     @Override
     public Dog editDogById(int id, String name, int height,int weight) {
-        Dog dog = new Dog(id, name, height, weight);
+        Dog dog = new Dog();
+        dog.setId(id);
+        dog.setName(name);
+        dog.setHeight(height);
+        dog.setWeight(weight);
         dogs.put(id, dog);
         return dog;
     }

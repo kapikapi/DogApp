@@ -2,8 +2,7 @@ package com.epam.dog.controller;
 
 import com.epam.dog.controller.vo.Dog;
 import com.epam.dog.controller.vo.DogDto;
-import com.epam.dog.dao.HibernateDao;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.epam.dog.dao.DogDAO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,7 @@ import java.util.Map;
 public class DogController {
 
 //    private final DogDAO dogDAO;
-    private final HibernateDao dogDAO;
+    private final DogDAO dogDAO;
 
     private DogDto getDogDto(Dog dog) {
         DogDto dogDto = new DogDto();
@@ -32,13 +31,8 @@ public class DogController {
         return dogDto;
     }
 
-//    @Autowired
-//    public DogController(DogDAO dogDAO) {
-//        this.dogDAO = dogDAO;
-//    }
-
-    @Autowired
-    public DogController(HibernateDao dogDAO) {
+    public DogController(DogDAO dogDAO) {
+        System.out.println(dogDAO == null);
         this.dogDAO = dogDAO;
     }
 
@@ -67,11 +61,7 @@ public class DogController {
 
     @RequestMapping(value = "/dog", method = RequestMethod.POST)
     public ResponseEntity<DogDto> createDog(@RequestBody DogDto dog, UriComponentsBuilder ucBuilder) {
-//        if (dogDAO.hasDog(dog.getId())) {
-//            dog.setId(dogDAO.getAllDogs().size());
-//        }
         int id = dogDAO.saveDog(dog.getName(), dog.getHeight(), dog.getWeight());
-
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/dog/{id}").buildAndExpand(id).toUri());
         return new ResponseEntity<>(dog, headers, HttpStatus.CREATED);
