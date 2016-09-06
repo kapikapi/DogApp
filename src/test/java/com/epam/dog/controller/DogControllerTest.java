@@ -10,11 +10,10 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 
@@ -46,7 +45,6 @@ public class DogControllerTest {
                 get("/dog/{id}").
                 then().
                 assertThat()
-//                .contentType(ContentType.JSON)
                 .statusCode(200)
                 .body("name", equalTo(dogsMap.get(id).getName()))
                 .body("height", equalTo(dogsMap.get(id).getHeight()))
@@ -55,27 +53,18 @@ public class DogControllerTest {
 
     @Test()
     public void shouldGetAllDogs() {
-        ArrayList<String> dogNames = new ArrayList<>();
-        ArrayList<Integer> dogHeights = new ArrayList<>();
-        ArrayList<Integer> dogWeights = new ArrayList<>();
-        DogDto dogDto = DogsHandler.setRandomDogDto();
-        int id = dogDAO.saveDog(dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
         for (Dog dog : dogDAO.getAllDogs().values()) {
-            dogNames.add(dog.getName());
-            dogHeights.add(dog.getHeight());
-            dogWeights.add(dog.getWeight());
+            given().
+                    when().
+                    get("/dog").
+                    then().
+                    assertThat()
+                    .contentType(ContentType.JSON)
+                    .statusCode(200)
+                    .body("name", hasItem(dog.getName()))
+                    .body("height", hasItem(dog.getHeight()))
+                    .body("weight", hasItem(dog.getWeight()));
         }
-
-        given().
-                when().
-                get("/dog").
-                then().
-                assertThat()
-                .contentType(ContentType.JSON)
-                .statusCode(200)
-                .body("name", contains(dogNames.get(id - 1)))
-                .body("height", contains(dogHeights.get(id - 1)))
-                .body("weight", contains(dogWeights.get(id - 1)));
     }
 
     @DataProvider(name = "newDog")

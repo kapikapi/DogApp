@@ -13,8 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,19 +45,20 @@ public class DogCtrlMockTest {
         DogDto dogDto = DogsHandler.setRandomDogDto();
         saveDog(dogDto)
                 .andExpect(status().isCreated());
+//        mvc.perform(delete("/dog/3"));
 
     }
 
     @Test
     public void shouldGetDogById() throws Exception {
         DogDto dogDto = DogsHandler.setRandomDogDto();
-        ResultActions resultActions = saveDog(dogDto);
-        mvc.perform(get("/dog/3"))
+        saveDog(dogDto);
+        mvc.perform(get("/dog/4"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(dogDto.getName()))
                 .andExpect(jsonPath("$.height").value(dogDto.getHeight()))
                 .andExpect(jsonPath("$.weight").value(dogDto.getWeight()));
-
+//        mvc.perform(delete("/dog/4"));
     }
 
     @Test
@@ -68,15 +68,28 @@ public class DogCtrlMockTest {
 
     @Test
     public void shouldUpdateDog() throws Exception {
-        DogDto dogDto = DogsHandler.setRandomDogDto();
-        saveDog(dogDto);
         DogDto updatedDog = DogsHandler.setRandomDogDto();
-        //TODO
+        final ObjectMapper mapper = new ObjectMapper();
+        final String jsonDog = mapper.writeValueAsString(updatedDog);
+
+        mvc.perform(put("/dog/2")
+                .content(jsonDog)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(updatedDog.getName()))
+                .andExpect(jsonPath("$.height").value(updatedDog.getHeight()))
+                .andExpect(jsonPath("$.weight").value(updatedDog.getWeight()));
     }
 
     @Test
-    public void shouldDeleteDogById() {
-        //TODO
+    public void shouldDeleteDogById() throws Exception {
+        DogDto dogDto = DogsHandler.setRandomDogDto();
+        saveDog(dogDto);
+        mvc.perform(delete("/dog/3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(dogDto.getName()))
+                .andExpect(jsonPath("$.height").value(dogDto.getHeight()))
+                .andExpect(jsonPath("$.weight").value(dogDto.getWeight()));
     }
 
 }
