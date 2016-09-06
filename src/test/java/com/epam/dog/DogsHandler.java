@@ -1,6 +1,6 @@
 package com.epam.dog;
 
-import com.epam.dog.controller.vo.DogDto;
+import com.epam.dog.vo.DogDto;
 
 import static io.qala.datagen.RandomShortApi.english;
 import static io.qala.datagen.RandomShortApi.integer;

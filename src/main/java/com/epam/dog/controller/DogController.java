@@ -1,7 +1,7 @@
 package com.epam.dog.controller;
 
-import com.epam.dog.controller.vo.Dog;
-import com.epam.dog.controller.vo.DogDto;
+import com.epam.dog.vo.Dog;
+import com.epam.dog.vo.DogDto;
 import com.epam.dog.dao.DogDAO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

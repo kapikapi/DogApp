@@ -24,7 +24,7 @@
         <!-- Drop and re-create the database schema on startup -->
         <property name="hbm2ddl.auto">create</property>
 
-        <!--<mapping class="com.epam.dog.controller.vo.DogEntity"/>-->
+        <!--<mapping class="com.epam.dog.vo.DogEntity"/>-->
 
         <mapping resource="Dog.hbm.xml"/>
 

@@ -1,8 +1,8 @@
 package com.epam.dog.dao;
 
 import com.epam.dog.DogsHandler;
-import com.epam.dog.controller.vo.Dog;
-import com.epam.dog.controller.vo.DogDto;
+import com.epam.dog.vo.Dog;
+import com.epam.dog.vo.DogDto;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 

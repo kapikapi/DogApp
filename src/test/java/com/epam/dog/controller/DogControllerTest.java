@@ -1,8 +1,8 @@
 package com.epam.dog.controller;
 
 import com.epam.dog.DogsHandler;
-import com.epam.dog.controller.vo.Dog;
-import com.epam.dog.controller.vo.DogDto;
+import com.epam.dog.vo.Dog;
+import com.epam.dog.vo.DogDto;
 import com.epam.dog.dao.DogDAO;
 import com.epam.dog.dao.HibernateDao;
 import io.restassured.http.ContentType;

@@ -4,7 +4,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="com.epam.dog.controller.vo.Dog" table="DOGS">
+    <class name="com.epam.dog.vo.Dog" table="DOGS">
         <meta attribute="class-description">
             This class contains the dog detail.
         </meta>

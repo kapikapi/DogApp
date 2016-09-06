@@ -1,4 +1,4 @@
-package com.epam.dog.controller.vo;
+package com.epam.dog.vo;
 
 public class Dog {
 

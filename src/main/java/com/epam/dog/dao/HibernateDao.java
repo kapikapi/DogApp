@@ -1,7 +1,7 @@
 package com.epam.dog.dao;
 
 import com.epam.dog.HibernateUtil;
-import com.epam.dog.controller.vo.Dog;
+import com.epam.dog.vo.Dog;
 import org.hibernate.Session;
 
 import java.util.List;
