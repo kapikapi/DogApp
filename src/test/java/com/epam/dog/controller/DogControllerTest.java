@@ -1,16 +1,14 @@
 package com.epam.dog.controller;
 
 import com.epam.dog.DogsHandler;
-import com.epam.dog.vo.Dog;
-import com.epam.dog.vo.DogDto;
 import com.epam.dog.dao.DogDAO;
 import com.epam.dog.dao.HibernateDao;
+import com.epam.dog.vo.Dog;
+import com.epam.dog.vo.DogDto;
 import io.restassured.http.ContentType;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.hasItem;
@@ -18,14 +16,13 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 
 public class DogControllerTest {
-    private Map<Integer, Dog> dogsMap;
+//    private Map<Integer, Dog> dogsMap;
     private DogDAO dogDAO;
 
     @BeforeTest
     public void shouldSetDogsInitialData() {
-//        dogDAO = new InMemoryDao();
         dogDAO = new HibernateDao();
-        dogsMap = dogDAO.getAllDogs();
+//        dogsMap = dogDAO.getAllDogs();
     }
 
 
@@ -39,6 +36,7 @@ public class DogControllerTest {
 
     @Test(dataProvider = "firstId")
     public void shouldGetDogById(String paramName, int id) {
+       DogDto newDog = saveDog();
         given().
                 pathParam(paramName, id).
                 when().
@@ -46,14 +44,14 @@ public class DogControllerTest {
                 then().
                 assertThat()
                 .statusCode(200)
-                .body("name", equalTo(dogsMap.get(id).getName()))
-                .body("height", equalTo(dogsMap.get(id).getHeight()))
-                .body("weight", equalTo(dogsMap.get(id).getWeight()));
+                .body("name", equalTo(newDog.getName()))
+                .body("height", equalTo(newDog.getHeight()))
+                .body("weight", equalTo(newDog.getWeight()));
     }
 
     @Test()
     public void shouldGetAllDogs() {
-        for (Dog dog : dogDAO.getAllDogs().values()) {
+        for (Dog dog : dogDAO.getAllDogs()) {
             given().
                     when().
                     get("/dog").
@@ -105,17 +103,16 @@ public class DogControllerTest {
     @DataProvider(name = "dogsIdToDelete")
     public Object[][] shouldSetIdForDogToBeDeleted() {
         return new Object[][]{
-                {"id", 3}
+                {"id", 1}
         };
     }
 
     @Test(dataProvider = "dogsIdToDelete")
     public void shouldDeleteDogById(String paramName, int id) {
-        DogDto dog = DogsHandler.setRandomDogDto();
+        DogDto dog = saveDog();
 
         given()
                 .contentType(ContentType.JSON)
-                .body(dog)
                 .when()
                 .post("/dog");
 
@@ -127,6 +124,16 @@ public class DogControllerTest {
                 .delete("/dog/{id}")
                 .then()
                 .statusCode(200);
+    }
+
+    private DogDto saveDog() {
+        DogDto newDog = DogsHandler.setRandomDogDto();
+        given()
+                .contentType(ContentType.JSON)
+                .body(newDog)
+                .when()
+                .post("/dog");
+        return newDog;
     }
 
 }

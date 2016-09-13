@@ -8,6 +8,10 @@
 
     <import resource="classpath*:../webapp/WEB-INF/mvc-dispatcher-servlet.xml"/>
 
+    <!--<bean name="dogDao" class="com.epam.dog.dao.HibernateDao">-->
+        <!--<property name="sessionFactory" ref="sessionFactory"/>-->
+    <!--</bean>-->
+
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="org.h2.Driver"/>

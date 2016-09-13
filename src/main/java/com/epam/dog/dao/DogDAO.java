@@ -2,10 +2,10 @@ package com.epam.dog.dao;
 
 import com.epam.dog.vo.Dog;
 
-import java.util.Map;
+import java.util.List;
 
 public interface DogDAO {
-    Map<Integer, Dog> getAllDogs();
+    List<Dog> getAllDogs();
     int saveDog(String name, int height, int weight);
     Dog getDogById(int id);
     Dog freeDogById(int id);

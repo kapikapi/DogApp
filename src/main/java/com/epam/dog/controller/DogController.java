@@ -1,8 +1,8 @@
 package com.epam.dog.controller;
 
+import com.epam.dog.dao.DogDAO;
 import com.epam.dog.vo.Dog;
 import com.epam.dog.vo.DogDto;
-import com.epam.dog.dao.DogDAO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 public class DogController {
@@ -38,12 +36,11 @@ public class DogController {
 
     @RequestMapping(value = "/dog", method = RequestMethod.GET)
     public ResponseEntity<List<Dog>> getAllDogs() {
-        Map<Integer, Dog> dogsMap = dogDAO.getAllDogs();
+        List<Dog> dogsMap = dogDAO.getAllDogs();
         if (dogsMap.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
-            List<Dog> dogList = new ArrayList<>(dogsMap.values());
-            return new ResponseEntity<>(dogList, HttpStatus.OK);
+            return new ResponseEntity<>(dogsMap, HttpStatus.OK);
         }
     }
 

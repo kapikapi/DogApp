@@ -1,22 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <mvc:annotation-driven/>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
 
-    <beans profile="hibernate">
-        <bean id="dogControllerBean" class="com.epam.dog.controller.DogController">
-            <constructor-arg ref="dogDaoBean"/>
+    <bean id="dogControllerBean" class="com.epam.dog.controller.DogController">
+        <constructor-arg ref="dogDaoBean"/>
+    </bean>
+    <bean name="dogDaoBean" class="com.epam.dog.dao.HibernateDao">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <beans>
+        <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+            <property name="driverClassName" value="org.h2.Driver"/>
+            <property name="url" value="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"/>
+            <property name="username" value="sa"/>
+            <property name="password" value=""/>
         </bean>
-        <bean name="dogDaoBean" class="com.epam.dog.dao.HibernateDao"/>
+        <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+            <property name="dataSource" ref="dataSource"/>
+            <property name="mappingResources">
+                <list>
+                    <value>
+                        Dog.hbm.xml
+                    </value>
+                </list>
+            </property>
+            <property name="hibernateProperties">
+                <props>
+                    <prop key="hibernate.connection.pool_size">1</prop>
+                    <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+                    <prop key="hibernate.show_sql">true</prop>
+                    <prop key="hibernate.hbm2ddl.auto">create</prop>
+                </props>
+            </property>
+        </bean>
+        <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+            <property name="sessionFactory" ref="sessionFactory"/>
+        </bean>
 
     </beans>
-    <beans profile="inMemory">
-        <bean name="dogDaoBean" class="com.epam.dog.dao.InMemoryDao"/>
-        <bean id="dogControllerBean" class="com.epam.dog.controller.DogController">
-            <constructor-arg ref="dogDaoBean" />
-        </bean>
-    </beans>
+
 
 </beans>

@@ -45,7 +45,6 @@ public class DogCtrlMockTest {
         DogDto dogDto = DogsHandler.setRandomDogDto();
         saveDog(dogDto)
                 .andExpect(status().isCreated());
-//        mvc.perform(delete("/dog/3"));
 
     }
 
@@ -53,7 +52,7 @@ public class DogCtrlMockTest {
     public void shouldGetDogById() throws Exception {
         DogDto dogDto = DogsHandler.setRandomDogDto();
         saveDog(dogDto);
-        mvc.perform(get("/dog/4"))
+        mvc.perform(get("/dog/2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(dogDto.getName()))
                 .andExpect(jsonPath("$.height").value(dogDto.getHeight()))
@@ -85,7 +84,7 @@ public class DogCtrlMockTest {
     public void shouldDeleteDogById() throws Exception {
         DogDto dogDto = DogsHandler.setRandomDogDto();
         saveDog(dogDto);
-        mvc.perform(delete("/dog/3"))
+        mvc.perform(delete("/dog/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(dogDto.getName()))
                 .andExpect(jsonPath("$.height").value(dogDto.getHeight()))

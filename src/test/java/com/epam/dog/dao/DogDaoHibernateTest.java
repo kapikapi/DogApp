@@ -3,23 +3,27 @@ package com.epam.dog.dao;
 import com.epam.dog.DogsHandler;
 import com.epam.dog.vo.Dog;
 import com.epam.dog.vo.DogDto;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
-import java.util.Map;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEquals;
 
-@ContextConfiguration(locations = {"classpath:../webapp/WEB-INF/mvc-dispatcher-servlet.xml",
-"classpath:../mvc-dispatcher-servlet-test.xml"})
-public class DogDaoHibernateTest {
+@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml",
+"file:src/test/mvc-dispatcher-servlet-test.xml"})
+public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContextTests{
 
     @Autowired
     DogDAO dogDAO = new HibernateDao();
+
+    @Autowired
+    private SessionFactory sessionFactory;
 
     private Dog saveNewDog() {
         DogDto newDog = DogsHandler.setRandomDogDto();
@@ -35,49 +39,39 @@ public class DogDaoHibernateTest {
     @Test
     public void shouldReturnAllDogs() {
         Dog dog = saveNewDog();
-        Map<Integer, Dog> dogActualMap = dogDAO.getAllDogs();
-//        assertEquals(1, dogActualMap.size());
-        assertReflectionEquals(dog, dogActualMap.get(dog.getId()));
-//        assertEquals(dog.getName(), dogActualMap.get(dog.getId()).getName());
-//        assertEquals(dog.getHeight(), dogActualMap.get(dog.getId()).getHeight());
-//        assertEquals(dog.getWeight(), dogActualMap.get(dog.getId()).getWeight());
+        sessionFactory.getCurrentSession().clear();
+        List<Dog> dogActualList = dogDAO.getAllDogs();
+        assertReflectionEquals(dog, dogActualList.get(dog.getId() - 1));
     }
 
     @Test
     public void shouldSaveSpecifiedDog() {
         int sizeBefore = dogDAO.getAllDogs().size();
         Dog dog = saveNewDog();
-
-        assertEquals(sizeBefore + 1, dogDAO.getAllDogs().size());
-        assertTrue(dogDAO.getAllDogs().containsKey(dog.getId()));
-        Dog actualDog = dogDAO.getAllDogs().get(dog.getId());
+        sessionFactory.getCurrentSession().clear();
+        List<Dog> updatedList = dogDAO.getAllDogs();
+        assertEquals(sizeBefore + 1, updatedList.size());
+//        assertTrue(dogDAO.getAllDogs().contains(dog));
+        Dog actualDog = updatedList.get(dog.getId() - 1);
         assertReflectionEquals(dog, actualDog);
-//        assertEquals(dog.getId(), actualDog.getId());
-//        assertEquals(dog.getName(), actualDog.getName());
-//        assertEquals(dog.getHeight(), actualDog.getHeight());
-//        assertEquals(dog.getWeight(), actualDog.getWeight());
     }
 
-    @org.testng.annotations.Test
+    @Test
     public void shouldReturnDogById() {
-//        DogDto dogDto = DogsHandler.setRandomDogDto();
-//        int id = dogDAO.saveDog(dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
         Dog dog = saveNewDog();
+        sessionFactory.getCurrentSession().clear();
         Dog actualDog = dogDAO.getDogById(dog.getId());
         assertReflectionEquals(dog, actualDog);
-//        assertEquals(id, actualDog.getId());
-//        assertEquals(dogDto.getName(), actualDog.getName());
-//        assertEquals(dogDto.getHeight(), actualDog.getHeight());
-//        assertEquals(dogDto.getWeight(), actualDog.getWeight());
     }
 
-    @org.testng.annotations.Test
+    @Test
     public void shouldRemoveDogById() {
         Dog dog = saveNewDog();
+        sessionFactory.getCurrentSession().clear();
         int sizeBefore = dogDAO.getAllDogs().size();
         dogDAO.freeDogById(dog.getId());
         assertEquals(sizeBefore - 1, dogDAO.getAllDogs().size());
-        assertFalse(dogDAO.getAllDogs().containsKey(dog.getId()));
+        assertFalse(dogDAO.getAllDogs().contains(dog));
 
     }
 }
