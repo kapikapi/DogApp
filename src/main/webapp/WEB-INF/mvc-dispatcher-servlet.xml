@@ -8,9 +8,9 @@
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <bean id="dogControllerBean" class="com.epam.dog.controller.DogController">
-        <constructor-arg ref="dogDaoBean"/>
+        <constructor-arg ref="dogDao"/>
     </bean>
-    <bean name="dogDaoBean" class="com.epam.dog.dao.HibernateDao">
+    <bean name="dogDao" class="com.epam.dog.dao.HibernateDao">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
 
