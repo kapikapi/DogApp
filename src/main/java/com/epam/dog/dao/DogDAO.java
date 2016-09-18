@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface DogDAO {
     List<Dog> getAllDogs();
-    int saveDog(String name, int height, int weight);
+    Dog saveDog(String name, int height, int weight);
     Dog getDogById(int id);
     Dog freeDogById(int id);
     boolean hasDog(int id);

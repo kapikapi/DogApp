@@ -57,11 +57,11 @@ public class DogController {
     }
 
     @RequestMapping(value = "/dog", method = RequestMethod.POST)
-    public ResponseEntity<DogDto> createDog(@RequestBody DogDto dog, UriComponentsBuilder ucBuilder) {
-        int id = dogDAO.saveDog(dog.getName(), dog.getHeight(), dog.getWeight());
+    public ResponseEntity<DogDto> createDog(@RequestBody DogDto dogDto, UriComponentsBuilder ucBuilder) {
+        Dog savedDog = dogDAO.saveDog(dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/dog/{id}").buildAndExpand(id).toUri());
-        return new ResponseEntity<>(dog, headers, HttpStatus.CREATED);
+        headers.setLocation(ucBuilder.path("/dog/{id}").buildAndExpand(savedDog.getId()).toUri());
+        return new ResponseEntity<>(dogDto, headers, HttpStatus.CREATED);
 
     }
 

@@ -11,12 +11,11 @@
         <constructor-arg ref="dogDao"/>
     </bean>
     <bean name="dogDao" class="com.epam.dog.dao.HibernateDao">
-        <property name="sessionFactory" ref="sessionFactory"/>
+        <constructor-arg ref="sessionFactory"/>
     </bean>
 
     <beans>
         <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-            <property name="driverClassName" value="org.h2.Driver"/>
             <property name="url" value="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"/>
             <property name="username" value="sa"/>
             <property name="password" value=""/>
@@ -44,6 +43,4 @@
         </bean>
 
     </beans>
-
-
 </beans>

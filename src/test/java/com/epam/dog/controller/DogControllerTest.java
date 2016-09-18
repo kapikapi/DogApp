@@ -2,11 +2,12 @@ package com.epam.dog.controller;
 
 import com.epam.dog.DogsHandler;
 import com.epam.dog.dao.DogDAO;
-import com.epam.dog.dao.HibernateDao;
 import com.epam.dog.vo.Dog;
 import com.epam.dog.vo.DogDto;
 import io.restassured.http.ContentType;
-import org.testng.annotations.BeforeTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -14,18 +15,11 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.IsEqual.equalTo;
 
+@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml"})
+public class DogControllerTest  extends AbstractTransactionalTestNGSpringContextTests {
 
-public class DogControllerTest {
-//    private Map<Integer, Dog> dogsMap;
+    @Autowired
     private DogDAO dogDAO;
-
-    @BeforeTest
-    public void shouldSetDogsInitialData() {
-        dogDAO = new HibernateDao();
-//        dogsMap = dogDAO.getAllDogs();
-    }
-
-
 
     @DataProvider(name = "firstId")
     public static Object[][] shouldSetFirstDogsId() {
@@ -109,15 +103,11 @@ public class DogControllerTest {
 
     @Test(dataProvider = "dogsIdToDelete")
     public void shouldDeleteDogById(String paramName, int id) {
-        DogDto dog = saveDog();
-
+        saveDog();
         given()
                 .contentType(ContentType.JSON)
                 .when()
                 .post("/dog");
-
-//        Dog doge = dogsMap.get(dogsMap.size());
-
         given()
                 .pathParam(paramName, id)
                 .when()

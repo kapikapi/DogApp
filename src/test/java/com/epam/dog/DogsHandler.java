@@ -2,17 +2,16 @@ package com.epam.dog;
 
 import com.epam.dog.vo.DogDto;
 
-import static io.qala.datagen.RandomShortApi.english;
-import static io.qala.datagen.RandomShortApi.integer;
+import static io.qala.datagen.RandomShortApi.positiveInteger;
+import static io.qala.datagen.RandomShortApi.unicode;
 
 public class DogsHandler {
 
     public static DogDto setRandomDogDto() {
         DogDto dog = new DogDto();
-        dog.setName(english(10));
-        dog.setHeight(integer(20, 100));
-        dog.setWeight(integer(3, 70));
+        dog.setName(unicode(0, 200));
+        dog.setHeight(positiveInteger());
+        dog.setWeight(positiveInteger());
         return dog;
     }
-
 }

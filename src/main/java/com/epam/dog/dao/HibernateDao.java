@@ -3,7 +3,6 @@ package com.epam.dog.dao;
 import com.epam.dog.vo.Dog;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -12,8 +11,7 @@ public class HibernateDao implements DogDAO {
 
     private SessionFactory sessionFactory;
 
-    @Required
-    public void setSessionFactory(SessionFactory sessionFactory) {
+    public HibernateDao(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
@@ -26,14 +24,14 @@ public class HibernateDao implements DogDAO {
 
     @Override
     @Transactional
-    public int saveDog(String name, int height,int weight) {
+    public Dog saveDog(String name, int height,int weight) {
         Session session = this.sessionFactory.getCurrentSession();
         Dog dog = new Dog();
         dog.setName(name);
         dog.setHeight(height);
         dog.setWeight(weight);
         session.save(dog);
-        return dog.getId();
+        return dog;
     }
 
     @Override

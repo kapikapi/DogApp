@@ -7,6 +7,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -26,12 +27,12 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
 
     private Dog saveNewDog() {
         DogDto newDog = DogsHandler.setRandomDogDto();
-        int id = dogDAO.saveDog(newDog.getName(), newDog.getHeight(), newDog.getWeight());
+        Dog savedDog = dogDAO.saveDog(newDog.getName(), newDog.getHeight(), newDog.getWeight());
         Dog dog = new Dog();
-        dog.setId(id);
-        dog.setName(newDog.getName());
-        dog.setHeight(newDog.getHeight());
-        dog.setWeight(newDog.getWeight());
+        dog.setId(savedDog.getId());
+        dog.setName(savedDog.getName());
+        dog.setHeight(savedDog.getHeight());
+        dog.setWeight(savedDog.getWeight());
         return dog;
     }
 
@@ -44,6 +45,7 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
         return null;
     }
 
+    @Transactional
     @Test
     public void shouldReturnAllDogs() {
         Dog dog = saveNewDog();
@@ -52,6 +54,7 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
         assertReflectionEquals(dog, getDogFromListById(dogActualList, dog.getId()));
     }
 
+    @Transactional
     @Test
     public void shouldSaveSpecifiedDog() {
         int sizeBefore = dogDAO.getAllDogs().size();
@@ -62,6 +65,25 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
         assertReflectionEquals(dog, getDogFromListById(updatedList, dog.getId()));
     }
 
+    @Transactional
+    @Test
+    public void shouldUpdateDog() {
+        Dog dog = saveNewDog();
+        sessionFactory.getCurrentSession().flush();
+        sessionFactory.getCurrentSession().clear();
+        DogDto newDogDto = DogsHandler.setRandomDogDto();
+        Dog updatedDog = new Dog();
+        updatedDog.setId(dog.getId());
+        updatedDog.setName(newDogDto.getName());
+        updatedDog.setHeight(newDogDto.getHeight());
+        updatedDog.setWeight(newDogDto.getWeight());
+        dogDAO.editDogById(dog.getId(), newDogDto.getName(), newDogDto.getHeight(), newDogDto.getWeight());
+        sessionFactory.getCurrentSession().flush();
+        sessionFactory.getCurrentSession().clear();
+        assertReflectionEquals(dogDAO.getDogById(dog.getId()), updatedDog);
+    }
+
+    @Transactional
     @Test
     public void shouldReturnDogById() {
         Dog dog = saveNewDog();
@@ -70,6 +92,7 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
         assertReflectionEquals(dog, actualDog);
     }
 
+    @Transactional
     @Test
     public void shouldRemoveDogById() {
         Dog dog = saveNewDog();
