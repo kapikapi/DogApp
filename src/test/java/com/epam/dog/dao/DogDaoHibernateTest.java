@@ -5,9 +5,11 @@ import com.epam.dog.vo.Dog;
 import com.epam.dog.vo.DogDto;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -46,6 +48,7 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
     }
 
     @Transactional
+    @Rollback
     @Test
     public void shouldReturnAllDogs() {
         Dog dog = saveNewDog();
@@ -55,17 +58,21 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
     }
 
     @Transactional
+    @Rollback
     @Test
     public void shouldSaveSpecifiedDog() {
         int sizeBefore = dogDAO.getAllDogs().size();
         Dog dog = saveNewDog();
-        sessionFactory.getCurrentSession().clear();
+//        sessionFactory.getCurrentSession().clear();
         List<Dog> updatedList = dogDAO.getAllDogs();
         assertEquals(sizeBefore + 1, updatedList.size());
         assertReflectionEquals(dog, getDogFromListById(updatedList, dog.getId()));
+//        dogDAO.getDogById(dog.getId());
+        System.out.println(dog.getId());
     }
 
     @Transactional
+    @Rollback
     @Test
     public void shouldUpdateDog() {
         Dog dog = saveNewDog();
@@ -84,6 +91,7 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
     }
 
     @Transactional
+    @Rollback
     @Test
     public void shouldReturnDogById() {
         Dog dog = saveNewDog();
@@ -93,6 +101,7 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
     }
 
     @Transactional
+    @Rollback
     @Test
     public void shouldRemoveDogById() {
         Dog dog = saveNewDog();
@@ -103,4 +112,10 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
         assertNull(getDogFromListById(dogDAO.getAllDogs(), dog.getId()));
 
     }
+
+    @AfterMethod
+    public void getActualDogsList() {
+        List<Dog> dogs = dogDAO.getAllDogs();
+    }
+
 }
