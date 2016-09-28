@@ -5,8 +5,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc
        http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx
-       http://www.springframework.org/schema/tx/spring-tx.xsd
-       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
 
     <mvc:annotation-driven/>
     <tx:annotation-driven transaction-manager="transactionManager"/>
@@ -18,15 +17,19 @@
         <constructor-arg ref="sessionFactory"/>
     </bean>
 
-    <bean id="aspectBean" class="com.epam.dog.Aspect"/>
-    <aop:config>
-        <aop:aspect ref="aspectBean">
-            <aop:pointcut id="performerPointcut" expression="execution (* com.epam.dog.dao.DogDAO.saveDog(..))"/>
-            <aop:before method="before" pointcut-ref="performerPointcut"/>
-            <aop:after method="after" pointcut-ref="performerPointcut"/>
-            <aop:after-returning method="afterReturning" pointcut-ref="performerPointcut"/>
-        </aop:aspect>
-    </aop:config>
+    <bean id="advisorBean" class="com.epam.dog.Advisor"/>
+    <!--<bean id="debugInterceptor" class="org.springframework.aop.interceptor.DebugInterceptor"/>-->
+
+    <bean id="dogInterfaceProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces" value="com.epam.dog.dao.DogDAO"/>
+        <property name="target" ref="dogDao"/>
+        <property name="interceptorNames">
+            <list>
+                <value>advisorBean</value>
+                <!--<value>debugInterceptor</value>-->
+            </list>
+        </property>
+    </bean>
 
     <beans>
         <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">

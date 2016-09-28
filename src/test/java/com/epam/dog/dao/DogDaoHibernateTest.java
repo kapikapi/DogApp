@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
+import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
@@ -114,8 +115,17 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
     }
 
     @AfterMethod
-    public void getActualDogsList() {
-        List<Dog> dogs = dogDAO.getAllDogs();
+    public void getActualDogsListBeforeRollback() {
+        System.out.println("== After test method");
+        System.out.println("== Dog still remains in the database:");
+        System.out.println("Hibernate: " + dogDAO.getAllDogs());
+
     }
 
+    @AfterTransaction
+    public void getActualDogsListAfterRollback() {
+        System.out.println("== After transaction end");
+        System.out.println("== Dog removed from database:");
+        System.out.println("Hibernate: " + dogDAO.getAllDogs());
+    }
 }

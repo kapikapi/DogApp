@@ -50,4 +50,10 @@ public class Dog {
 //    public boolean equals(Object obj) {
 //        return obj != null && (obj == this || obj instanceof Dog && ((Dog) obj).getId() == this.getId());
 //    }
+
+
+    @Override
+    public String toString() {
+        return String.format("[%s:: %s / %s / %s]", id, name, height, weight);
+    }
 }
