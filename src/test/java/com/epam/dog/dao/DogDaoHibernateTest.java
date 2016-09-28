@@ -5,6 +5,7 @@ import com.epam.dog.vo.Dog;
 import com.epam.dog.vo.DogDto;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
@@ -22,8 +23,13 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
 @ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml"})
 public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContextTests{
 
+    @Qualifier("dogDao")
     @Autowired
     private DogDAO dogDAO;
+
+    @Qualifier("dogInterfaceProxy")
+    @Autowired
+    private DogDAO dogDAOProxy;
 
     @Autowired
     private SessionFactory sessionFactory;
