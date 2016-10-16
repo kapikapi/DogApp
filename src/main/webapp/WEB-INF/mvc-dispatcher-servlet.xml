@@ -17,6 +17,8 @@
         <constructor-arg ref="sessionFactory"/>
     </bean>
 
+    <bean name="validator" class="com.epam.dog.BalanceValidator"/>
+
     <beans>
         <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
             <property name="driverClassName" value="org.h2.Driver"/>
