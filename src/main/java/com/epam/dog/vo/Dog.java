@@ -1,18 +1,17 @@
 package com.epam.dog.vo;
 
+import com.epam.dog.Balance;
+
+import javax.validation.constraints.Size;
+
+@Balance
 public class Dog {
 
     private int id;
+    @Size(min = 2, max = 200)
     private String name;
     private int height;
     private int weight;
-
-//    public Dog(int id, String name, int height, int weight) {
-//        this.id = id;
-//        this.name = name;
-//        this.height = height;
-//        this.weight = weight;
-//    }
 
     public int getId() {
         return id;

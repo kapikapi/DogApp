@@ -1,5 +1,6 @@
 package com.epam.dog;
 
+import com.epam.dog.aop.DogDaoLogger;
 import com.epam.dog.dao.DogDAO;
 import com.epam.dog.vo.Dog;
 import com.epam.dog.vo.DogDto;

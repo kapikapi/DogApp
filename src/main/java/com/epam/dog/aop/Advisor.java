@@ -1,4 +1,4 @@
-package com.epam.dog;
+package com.epam.dog.aop;
 
 import org.springframework.aop.AfterReturningAdvice;
 
