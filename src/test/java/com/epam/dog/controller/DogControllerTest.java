@@ -11,12 +11,14 @@ import org.springframework.test.context.testng.AbstractTransactionalTestNGSpring
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import static io.qala.datagen.RandomShortApi.positiveInteger;
+import static io.qala.datagen.RandomShortApi.unicode;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 @ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml"})
-public class DogControllerTest  extends AbstractTransactionalTestNGSpringContextTests {
+public class DogControllerTest extends AbstractTransactionalTestNGSpringContextTests {
 
     @Autowired
     private DogDAO dogDAO;
@@ -24,13 +26,27 @@ public class DogControllerTest  extends AbstractTransactionalTestNGSpringContext
     @DataProvider(name = "firstId")
     public static Object[][] shouldSetFirstDogsId() {
         return new Object[][]{
+                {"id", 1}
+        };
+    }
+
+    @DataProvider(name = "secondId")
+    public static Object[][] shouldSetSecondDogsId() {
+        return new Object[][]{
                 {"id", 2}
         };
     }
 
-    @Test(dataProvider = "firstId")
+    @DataProvider(name = "thirdId")
+    public static Object[][] shouldSetThirdDogsId() {
+        return new Object[][]{
+                {"id", 3}
+        };
+    }
+
+    @Test(dataProvider = "thirdId")
     public void shouldGetDogById(String paramName, int id) {
-       DogDto newDog = saveDog();
+        DogDto newDog = saveDog();
         given().
                 pathParam(paramName, id).
                 when().
@@ -78,7 +94,7 @@ public class DogControllerTest  extends AbstractTransactionalTestNGSpringContext
                 .statusCode(201);
     }
 
-    @Test(dataProvider = "firstId")
+    @Test(dataProvider = "secondId")
     public void shouldUpdateDogById(String paramName, int id) {
         DogDto luhu = DogsHandler.setRandomDogDto();
         given()
@@ -94,14 +110,14 @@ public class DogControllerTest  extends AbstractTransactionalTestNGSpringContext
                 .body("weight", equalTo(luhu.getWeight()));
     }
 
-    @DataProvider(name = "dogsIdToDelete")
-    public Object[][] shouldSetIdForDogToBeDeleted() {
-        return new Object[][]{
-                {"id", 1}
-        };
-    }
+//    @DataProvider(name = "dogsIdToDelete")
+//    public Object[][] shouldSetIdForDogToBeDeleted() {
+//        return new Object[][]{
+//                {"id", 1}
+//        };
+//    }
 
-    @Test(dataProvider = "dogsIdToDelete")
+    @Test(dataProvider = "firstId")
     public void shouldDeleteDogById(String paramName, int id) {
         saveDog();
         given()
@@ -114,6 +130,47 @@ public class DogControllerTest  extends AbstractTransactionalTestNGSpringContext
                 .delete("/dog/{id}")
                 .then()
                 .statusCode(200);
+    }
+
+    @DataProvider(name = "unbalancedDogToSave")
+    public Object[][] unbalancedDog() {
+        DogDto unbalancedDog = new DogDto();
+        int height = positiveInteger();
+        unbalancedDog.setName(unicode(2, 200));
+        unbalancedDog.setHeight(height);
+        unbalancedDog.setWeight(height);
+        return new Object[][]{
+                {"dog", unbalancedDog}
+        };
+    }
+
+    @Test(dataProvider = "unbalancedDogToSave")
+    public void failsUnbalancedDogSave(String paramName, DogDto unbalancedDog) {
+        given()
+                .contentType(ContentType.JSON)
+                .body(unbalancedDog)
+                .when()
+                .post("/dog")
+                .then()
+                .statusCode(500);
+    }
+
+    @Test(dataProvider = "firstId")
+    public void failsUpdateWithUnbalancedDog(String paramName, int id) {
+        saveDog();
+        DogDto dogDto = new DogDto();
+        int height = positiveInteger();
+        dogDto.setName(unicode(2, 200));
+        dogDto.setHeight(height);
+        dogDto.setWeight(height);
+        given()
+                .pathParam(paramName, id)
+                .contentType(ContentType.JSON)
+                .body(dogDto)
+                .when()
+                .put("/dog/{id}")
+                .then()
+                .statusCode(500);
     }
 
     private DogDto saveDog() {

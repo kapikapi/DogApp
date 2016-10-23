@@ -20,11 +20,14 @@
     <bean name="validator" class="com.epam.dog.BalanceValidator"/>
 
     <beans>
-        <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource">
             <property name="driverClassName" value="org.h2.Driver"/>
             <property name="url" value="jdbc:h2:mem:DOG;DB_CLOSE_DELAY=-1"/>
             <property name="username" value="sa"/>
             <property name="password" value=""/>
+            <property name="maxActive" value="100"/>
+            <property name="maxIdle" value="30"/>
+            <property name="maxWait" value="10000"/>
         </bean>
         <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
             <property name="dataSource" ref="dataSource"/>
@@ -41,11 +44,6 @@
                     <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
                     <prop key="hibernate.show_sql">true</prop>
                     <prop key="hibernate.hbm2ddl.auto">create</prop>
-
-                    <prop key="hibernate.dbcp.initialSize">8</prop>
-                    <prop key="hibernate.dbcp.maxActive">20</prop>
-                    <prop key="hibernate.dbcp.maxIdle">20</prop>
-                    <prop key="hibernate.dbcp.minIdle">0</prop>
                 </props>
             </property>
         </bean>
