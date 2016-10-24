@@ -1,23 +1,18 @@
 package com.epam.dog.dao;
 
 import com.epam.dog.vo.Dog;
-import com.epam.dog.vo.DogDto;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
-import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.validation.*;
 import java.util.Set;
 
+import static io.qala.datagen.RandomShortApi.positiveInteger;
+import static io.qala.datagen.RandomShortApi.unicode;
 import static org.testng.Assert.assertEquals;
 
-@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml"})
-public class ValidationTest extends AbstractTransactionalTestNGSpringContextTests{
-    
+public class ValidationTest {
+
     private static Validator validator;
 
     @BeforeClass
@@ -35,30 +30,42 @@ public class ValidationTest extends AbstractTransactionalTestNGSpringContextTest
         return dog;
     }
 
-    @Transactional
     @Test
-    public void checkNameSizeConstraint() {
-        Dog dog = createDog(1, "A", 40, 10);
+    public void failsNameSizeValidation() {
+        Dog dog = createDog(positiveInteger(), unicode(0, 1), positiveInteger(), positiveInteger());
         Set<ConstraintViolation<Dog>> constraintViolations =
                 validator.validate(dog);
 
-        assertEquals( 1, constraintViolations.size() );
+        assertEquals(1, constraintViolations.size() );
         assertEquals("size must be between 2 and 200",
                 constraintViolations.iterator().next().getMessage()
         );
 
     }
 
-    @Transactional
     @Test
-    public void checkHeightWeightSizeConstraint() {
-        Dog dog = createDog(2, "Bbbb", 40, 40);
+    public void failsDogBalanceValidation() {
+        int height = positiveInteger();
+        Dog dog = createDog(positiveInteger(), unicode(2, 200), height, height);
         Set<ConstraintViolation<Dog>> constraintViolations =
                 validator.validate(dog);
         assertEquals(1, constraintViolations.size());
         assertEquals("Height and weight are not balanced!",
                 constraintViolations.iterator().next().getMessage()
         );
+    }
+
+    @Test
+    public void succeedsDogValidation() {
+        int height = positiveInteger();
+        int weight = positiveInteger();
+        if (height == weight) {
+            weight = height + 1;
+        }
+        Dog dog = createDog(positiveInteger(), unicode(2, 200), height, weight);
+        Set<ConstraintViolation<Dog>> constraintViolations =
+                validator.validate(dog);
+        assertEquals(0, constraintViolations.size() );
     }
 
 }
