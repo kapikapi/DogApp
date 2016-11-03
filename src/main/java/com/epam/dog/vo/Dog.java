@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 public class Dog {
 
     private int id;
-    @Size(min = 2, max = 200)
+    @Size(min = 1, max = 100)
     private String name;
     private int height;
     private int weight;
