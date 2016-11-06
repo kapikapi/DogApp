@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static io.qala.datagen.RandomShortApi.unicode;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,7 +42,6 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.name").value(dogDto.getName()))
                 .andExpect(jsonPath("$.height").value(dogDto.getHeight()))
                 .andExpect(jsonPath("$.weight").value(dogDto.getWeight()));
-
     }
 
     @Test
@@ -67,7 +67,6 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
         int id = saveDog(dogDto);
         DogDto updatedDog = DogsHandler.setCorrectDogDto();
         final String jsonDog = dogDtoToJson(updatedDog);
-
         mvc.perform(put("/dog/" + id)
                 .content(jsonDog)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -79,13 +78,44 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void shouldDeleteDogById() throws Exception {
-        DogDto dogDto = DogsHandler.setCorrectDogDto();
-        int id = saveDog(dogDto);
+        int id = saveDog(DogsHandler.setCorrectDogDto());
         mvc.perform(delete("/dog/" + id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(dogDto.getName()))
-                .andExpect(jsonPath("$.height").value(dogDto.getHeight()))
-                .andExpect(jsonPath("$.weight").value(dogDto.getWeight()));
+                .andExpect(status().isOk());
+        mvc.perform(get("/dog/" + id))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void tooLongName_failSave() throws Exception {
+        DogDto dogDto = DogsHandler.setTooLongNameDogDto();
+        checksBadRequest(dogDto);
+    }
+
+    @Test
+    public void unbalancedDog_failSave() throws Exception {
+        DogDto dogDto = DogsHandler.setUnbalancedDogDto();
+        checksBadRequest(dogDto);
+    }
+
+    @Test
+    public void tooShortDogName_failSave() throws Exception {
+        DogDto dogDto = DogsHandler.setCorrectDogDto();
+        dogDto.setName("");
+        checksBadRequest(dogDto);
+    }
+
+    @Test
+    public void wrongBorderDogName_failSave() throws Exception {
+        DogDto dogDto = DogsHandler.setCorrectDogDto();
+        dogDto.setName(unicode(101));
+        checksBadRequest(dogDto);
+    }
+
+    private void checksBadRequest(DogDto dogDto) throws Exception {
+        mvc.perform(post("/dog")
+                .content(dogDtoToJson(dogDto))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     private int saveDog(DogDto dog) throws Exception {

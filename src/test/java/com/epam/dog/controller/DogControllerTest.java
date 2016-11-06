@@ -6,8 +6,6 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
 
-import static io.qala.datagen.RandomShortApi.positiveInteger;
-import static io.qala.datagen.RandomShortApi.unicode;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -65,69 +63,40 @@ public class DogControllerTest{
 
     @Test
     public void shouldUpdateDogById() {
-        int id = saveDog(DogsHandler.setRandomDogDto());
-        DogDto luhu = DogsHandler.setCorrectDogDto();
+        DogDto dogDto = DogsHandler.setCorrectDogDto();
+        int id = saveDog(dogDto);
+
         given()
                 .pathParam("id", id)
                 .contentType(ContentType.JSON)
-                .body(luhu)
+                .body(dogDto)
                 .when()
                 .put("/dog/{id}")
                 .then()
                 .statusCode(200)
-                .body("name", equalTo(luhu.getName()))
-                .body("height", equalTo(luhu.getHeight()))
-                .body("weight", equalTo(luhu.getWeight()));
+                .body("name", equalTo(dogDto.getName()))
+                .body("height", equalTo(dogDto.getHeight()))
+                .body("weight", equalTo(dogDto.getWeight()));
     }
 
     @Test
     public void shouldDeleteDogById() {
-        int id = saveDog(DogsHandler.setRandomDogDto());
-        given()
-                .contentType(ContentType.JSON)
-                .when()
-                .post("/dog");
+        int id = saveDog(DogsHandler.setCorrectDogDto());
         given()
                 .pathParam("id", id)
                 .when()
                 .delete("/dog/{id}")
                 .then()
                 .statusCode(200);
-    }
 
-//    @Test
-//    public void failsUnbalancedDogSave() {
-//        DogDto unbalancedDog = new DogDto();
-//        int height = positiveInteger();
-//        unbalancedDog.setName(unicode(2, 200));
-//        unbalancedDog.setHeight(height);
-//        unbalancedDog.setWeight(height);
-//        given()
-//                .contentType(ContentType.JSON)
-//                .body(unbalancedDog)
-//                .when()
-//                .post("/dog")
-//                .then()
-//                .statusCode(500);
-//    }
-//
-//    @Test
-//    public void failsUpdateWithUnbalancedDog() {
-//        int id = saveDog(DogsHandler.setRandomDogDto());
-//        DogDto dogDto = new DogDto();
-//        int height = positiveInteger();
-//        dogDto.setName(unicode(2, 200));
-//        dogDto.setHeight(height);
-//        dogDto.setWeight(height);
-//        given()
-//                .pathParam("id", id)
-//                .contentType(ContentType.JSON)
-//                .body(dogDto)
-//                .when()
-//                .put("/dog/{id}")
-//                .then()
-//                .statusCode(500);
-//    }
+        given().
+                pathParam("id", id).
+                when().
+                get("/dog/{id}").
+                then().
+                assertThat()
+                .statusCode(404);
+    }
 
     private int saveDog(DogDto newDog) {
         Response response = given()

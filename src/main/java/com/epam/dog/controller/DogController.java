@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
 public class DogController {
 
-//    private final DogDAO dogDAO;
     private final DogDAO dogDAO;
 
     private DogDto getDogDto(Dog dog) {
@@ -57,16 +57,15 @@ public class DogController {
     }
 
     @RequestMapping(value = "/dog", method = RequestMethod.POST)
-    public ResponseEntity<DogDto> createDog(@RequestBody DogDto dogDto, UriComponentsBuilder ucBuilder) {
+    public ResponseEntity<DogDto> createDog(@RequestBody @Valid DogDto dogDto, UriComponentsBuilder ucBuilder) {
         Dog savedDog = dogDAO.saveDog(dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/dog/{id}").buildAndExpand(savedDog.getId()).toUri());
         return new ResponseEntity<>(dogDto, headers, HttpStatus.CREATED);
-
     }
 
     @RequestMapping(value = "/dog/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<DogDto> updateDog(@PathVariable("id") int id, @RequestBody DogDto dog) {
+    public ResponseEntity<DogDto> updateDog(@PathVariable("id") int id, @RequestBody @Valid DogDto dog) {
         if (!dogDAO.hasDog(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {

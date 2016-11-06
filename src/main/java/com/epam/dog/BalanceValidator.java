@@ -1,11 +1,11 @@
 package com.epam.dog;
 
-import com.epam.dog.vo.Dog;
+import com.epam.dog.vo.DogDto;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class BalanceValidator implements ConstraintValidator<Balance, Dog> {
+public class BalanceValidator implements ConstraintValidator<Balance, DogDto> {
 
     @Override
     public void initialize(Balance constraintAnnotation) {
@@ -13,7 +13,7 @@ public class BalanceValidator implements ConstraintValidator<Balance, Dog> {
     }
 
     @Override
-    public boolean isValid(Dog dog, ConstraintValidatorContext constraintContext) {
+    public boolean isValid(DogDto dog, ConstraintValidatorContext constraintContext) {
         return dog.getWeight() != dog.getHeight();
     }
 }

@@ -1,14 +1,10 @@
 package com.epam.dog.vo;
 
-import com.epam.dog.Balance;
-
-import javax.validation.constraints.Size;
-
-@Balance
+//@Balance
 public class Dog {
 
     private int id;
-    @Size(min = 1, max = 100)
+//    @Size(min = 1, max = 100)
     private String name;
     private int height;
     private int weight;
@@ -44,12 +40,6 @@ public class Dog {
     public void setWeight(int weight) {
         this.weight = weight;
     }
-
-//    @Override
-//    public boolean equals(Object obj) {
-//        return obj != null && (obj == this || obj instanceof Dog && ((Dog) obj).getId() == this.getId());
-//    }
-
 
     @Override
     public String toString() {
