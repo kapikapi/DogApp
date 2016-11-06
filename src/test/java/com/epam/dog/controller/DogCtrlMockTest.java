@@ -48,17 +48,18 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
     public void shouldReturnAllDogs() throws Exception {
         DogDto firstDog = DogsHandler.setCorrectDogDto();
         DogDto secondDog = DogsHandler.setCorrectDogDto();
-        saveDog(firstDog);
-        saveDog(secondDog);
+        int firstId = saveDog(firstDog);
+        int secondId = saveDog(secondDog);
+        String jsonPathPattern = "$[?(@.id==%s)].%s";
         mvc.perform(get("/dog")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value(firstDog.getName()))
-                .andExpect(jsonPath("$[0].height").value(firstDog.getHeight()))
-                .andExpect(jsonPath("$[0].weight").value(firstDog.getWeight()))
-                .andExpect(jsonPath("$[1].name").value(secondDog.getName()))
-                .andExpect(jsonPath("$[1].height").value(secondDog.getHeight()))
-                .andExpect(jsonPath("$[1].weight").value(secondDog.getWeight()));
+                .andExpect(jsonPath(String.format(jsonPathPattern, firstId, "name")).value(firstDog.getName()))
+                .andExpect(jsonPath(String.format(jsonPathPattern, firstId, "height")).value(firstDog.getHeight()))
+                .andExpect(jsonPath(String.format(jsonPathPattern, firstId, "weight")).value(firstDog.getWeight()))
+                .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "name")).value(secondDog.getName()))
+                .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "height")).value(secondDog.getHeight()))
+                .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "weight")).value(secondDog.getWeight()));
     }
 
     @Test
@@ -66,7 +67,7 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
         DogDto dogDto = DogsHandler.setCorrectDogDto();
         int id = saveDog(dogDto);
         DogDto updatedDog = DogsHandler.setCorrectDogDto();
-        final String jsonDog = dogDtoToJson(updatedDog);
+        final String jsonDog = objectToJson(updatedDog);
         mvc.perform(put("/dog/" + id)
                 .content(jsonDog)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -92,15 +93,15 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void unbalancedDog_failSave() throws Exception {
-        DogDto dogDto = DogsHandler.setUnbalancedDogDto();
+    public void tooShortDogName_failSave() throws Exception {
+        DogDto dogDto = DogsHandler.setCorrectDogDto();
+        dogDto.setName("");
         checksBadRequest(dogDto);
     }
 
     @Test
-    public void tooShortDogName_failSave() throws Exception {
-        DogDto dogDto = DogsHandler.setCorrectDogDto();
-        dogDto.setName("");
+    public void unbalancedDog_failSave() throws Exception {
+        DogDto dogDto = DogsHandler.setUnbalancedDogDto();
         checksBadRequest(dogDto);
     }
 
@@ -111,16 +112,28 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
         checksBadRequest(dogDto);
     }
 
+    @Test
+    public void correctBorderName_succeedSave() throws Exception {
+        DogDto dogDto = DogsHandler.setCorrectDogDto();
+        dogDto.setName(unicode(1));
+        int id = saveDog(dogDto);
+        mvc.perform(get("/dog/" + id))
+                .andExpect(status().isOk());
+        dogDto.setName(unicode(100));
+        id = saveDog(dogDto);
+        mvc.perform(get("/dog/" + id))
+                .andExpect(status().isOk());
+    }
+
     private void checksBadRequest(DogDto dogDto) throws Exception {
         mvc.perform(post("/dog")
-                .content(dogDtoToJson(dogDto))
+                .content(objectToJson(dogDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     private int saveDog(DogDto dog) throws Exception {
-        final String jsonDog = dogDtoToJson(dog);
-
+        final String jsonDog = objectToJson(dog);
         MvcResult result = mvc.perform(post("/dog")
                 .content(jsonDog)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -130,8 +143,9 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
         return Integer.parseInt(id);
     }
 
-    private String dogDtoToJson(DogDto dog) throws JsonProcessingException {
+    private String objectToJson(Object dog) throws JsonProcessingException {
         final ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(dog);
     }
+
 }

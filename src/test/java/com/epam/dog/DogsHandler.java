@@ -20,7 +20,7 @@ public class DogsHandler {
 
     public static DogDto setTooLongNameDogDto() {
         DogDto dog = setCorrectDogDto();
-        dog.setName(unicode(101, 1000));
+        dog.setName(unicode(101, 65536));
         return dog;
     }
 

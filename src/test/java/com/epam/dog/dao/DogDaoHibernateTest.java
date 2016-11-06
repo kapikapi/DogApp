@@ -5,14 +5,12 @@ import com.epam.dog.vo.Dog;
 import com.epam.dog.vo.DogDto;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
-import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.transaction.annotation.Transactional;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
@@ -22,19 +20,14 @@ import static org.unitils.reflectionassert.ReflectionAssert.assertReflectionEqua
 @ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml"})
 public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContextTests{
 
-//    @Qualifier("dogDao")
     @Autowired
     private DogDAO dogDAO;
-
-//    @Qualifier("dogInterfaceProxy")
-//    @Autowired
-//    private DogDAO dogDAOProxy;
 
     @Autowired
     private SessionFactory sessionFactory;
 
     private Dog saveNewDog() {
-        DogDto newDog = DogsHandler.setRandomDogDto();
+        DogDto newDog = DogsHandler.setCorrectDogDto();
         Dog savedDog = dogDAO.saveDog(newDog.getName(), newDog.getHeight(), newDog.getWeight());
         Dog dog = new Dog();
         dog.setId(savedDog.getId());
@@ -54,83 +47,66 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
     }
 
     @Transactional
-    @Rollback
     @Test
     public void shouldReturnAllDogs() {
-        Dog dog = saveNewDog();
-        sessionFactory.getCurrentSession().clear();
+        Dog dogFirst = saveNewDog();
+        Dog dogSecond = saveNewDog();
+        List<Dog> expectedList = new ArrayList<>();
+        expectedList.add(dogFirst);
+        expectedList.add(dogSecond);
+        flushAndClear();
         List<Dog> dogActualList = dogDAO.getAllDogs();
-        assertReflectionEquals(dog, getDogFromListById(dogActualList, dog.getId()));
+        assertReflectionEquals(expectedList, dogActualList);
     }
 
     @Transactional
-    @Rollback
     @Test
     public void shouldSaveSpecifiedDog() {
         int sizeBefore = dogDAO.getAllDogs().size();
         Dog dog = saveNewDog();
-//        sessionFactory.getCurrentSession().clear();
         List<Dog> updatedList = dogDAO.getAllDogs();
         assertEquals(sizeBefore + 1, updatedList.size());
         assertReflectionEquals(dog, getDogFromListById(updatedList, dog.getId()));
-//        dogDAO.getDogById(dog.getId());
-        System.out.println(dog.getId());
     }
 
     @Transactional
-    @Rollback
     @Test
     public void shouldUpdateDog() {
         Dog dog = saveNewDog();
-        sessionFactory.getCurrentSession().flush();
-        sessionFactory.getCurrentSession().clear();
-        DogDto newDogDto = DogsHandler.setRandomDogDto();
-        Dog updatedDog = new Dog();
-        updatedDog.setId(dog.getId());
-        updatedDog.setName(newDogDto.getName());
-        updatedDog.setHeight(newDogDto.getHeight());
-        updatedDog.setWeight(newDogDto.getWeight());
-        dogDAO.editDogById(dog.getId(), newDogDto.getName(), newDogDto.getHeight(), newDogDto.getWeight());
-        sessionFactory.getCurrentSession().flush();
-        sessionFactory.getCurrentSession().clear();
-        assertReflectionEquals(dogDAO.getDogById(dog.getId()), updatedDog);
+        flushAndClear();
+        DogDto newDogDto = DogsHandler.setCorrectDogDto();
+        dog.setName(newDogDto.getName());
+        dog.setHeight(newDogDto.getHeight());
+        dog.setWeight(newDogDto.getWeight());
+        dogDAO.editDogById(dog.getId(), dog.getName(), dog.getHeight(), dog.getWeight());
+        flushAndClear();
+        assertReflectionEquals(dogDAO.getDogById(dog.getId()), dog);
     }
 
     @Transactional
-    @Rollback
     @Test
     public void shouldReturnDogById() {
         Dog dog = saveNewDog();
-        sessionFactory.getCurrentSession().clear();
+        flushAndClear();
         Dog actualDog = dogDAO.getDogById(dog.getId());
         assertReflectionEquals(dog, actualDog);
     }
 
     @Transactional
-    @Rollback
     @Test
     public void shouldRemoveDogById() {
         Dog dog = saveNewDog();
-        sessionFactory.getCurrentSession().clear();
+        flushAndClear();
         int sizeBefore = dogDAO.getAllDogs().size();
         dogDAO.freeDogById(dog.getId());
         assertEquals(sizeBefore - 1, dogDAO.getAllDogs().size());
-        assertNull(getDogFromListById(dogDAO.getAllDogs(), dog.getId()));
+        assertNull(dogDAO.getDogById(dog.getId()));
 
     }
 
-    @AfterMethod
-    public void getActualDogsListBeforeRollback() {
-        System.out.println("== After test method");
-        System.out.println("== Dog still remains in the database:");
-        System.out.println("Hibernate: " + dogDAO.getAllDogs());
-
+    private void flushAndClear() {
+        sessionFactory.getCurrentSession().flush();
+        sessionFactory.getCurrentSession().clear();
     }
 
-    @AfterTransaction
-    public void getActualDogsListAfterRollback() {
-        System.out.println("== After transaction end");
-        System.out.println("== Dog removed from database:");
-        System.out.println("Hibernate: " + dogDAO.getAllDogs());
-    }
 }

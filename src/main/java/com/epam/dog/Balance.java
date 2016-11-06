@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = BalanceValidator.class)
 public @interface Balance {
-    String message() default "Height and weight are not balanced!";
+    String message() default "Height and weight are not balanced";
 
     Class<?>[] groups() default { };
 

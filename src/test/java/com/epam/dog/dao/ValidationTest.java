@@ -1,17 +1,23 @@
 package com.epam.dog.dao;
 
-import com.epam.dog.vo.Dog;
+import com.epam.dog.DogsHandler;
+import com.epam.dog.vo.DogDto;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import javax.validation.*;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.util.Set;
 
-import static io.qala.datagen.RandomShortApi.positiveInteger;
 import static io.qala.datagen.RandomShortApi.unicode;
 import static org.testng.Assert.assertEquals;
 
 public class ValidationTest {
+
+    private static final String NAME_SIZE_VALIDATION_ERROR_MESSAGE = "Size must be between 1 and 100";
+    private static final String UNBALANCED_VALIDATION_ERROR_MESSAGE = "Height and weight are not balanced";
 
     private static Validator validator;
 
@@ -21,51 +27,53 @@ public class ValidationTest {
         validator = factory.getValidator();
     }
 
-    private Dog createDog(int id, String name, int height, int weight) {
-        Dog dog = new Dog();
-        dog.setId(id);
-        dog.setName(name);
-        dog.setHeight(height);
-        dog.setWeight(weight);
-        return dog;
+    @Test
+    public void failsTooShortNameSizeValidation() {
+        DogDto dogDto = DogsHandler.setCorrectDogDto();
+        dogDto.setName("");
+        checksValidationFail(dogDto, NAME_SIZE_VALIDATION_ERROR_MESSAGE);
     }
 
     @Test
-    public void failsNameSizeValidation() {
-        Dog dog = createDog(positiveInteger(), unicode(0, 1), positiveInteger(), positiveInteger());
-        Set<ConstraintViolation<Dog>> constraintViolations =
-                validator.validate(dog);
+    public void failsTooLongBorderNameSizeValidation() {
+        DogDto dogDto = DogsHandler.setCorrectDogDto();
+        dogDto.setName(unicode(101));
+        checksValidationFail(dogDto, NAME_SIZE_VALIDATION_ERROR_MESSAGE);
+    }
 
-        assertEquals(1, constraintViolations.size() );
-        assertEquals("size must be between 2 and 200",
-                constraintViolations.iterator().next().getMessage()
-        );
-
+    @Test
+    public void failsTooLongNameSizeValidation() {
+        checksValidationFail(DogsHandler.setTooLongNameDogDto(), NAME_SIZE_VALIDATION_ERROR_MESSAGE);
     }
 
     @Test
     public void failsDogBalanceValidation() {
-        int height = positiveInteger();
-        Dog dog = createDog(positiveInteger(), unicode(2, 200), height, height);
-        Set<ConstraintViolation<Dog>> constraintViolations =
-                validator.validate(dog);
-        assertEquals(1, constraintViolations.size());
-        assertEquals("Height and weight are not balanced!",
-                constraintViolations.iterator().next().getMessage()
-        );
+        checksValidationFail(DogsHandler.setUnbalancedDogDto(), UNBALANCED_VALIDATION_ERROR_MESSAGE);
     }
 
     @Test
     public void succeedsDogValidation() {
-        int height = positiveInteger();
-        int weight = positiveInteger();
-        if (height == weight) {
-            weight = height + 1;
-        }
-        Dog dog = createDog(positiveInteger(), unicode(2, 200), height, weight);
-        Set<ConstraintViolation<Dog>> constraintViolations =
-                validator.validate(dog);
-        assertEquals(0, constraintViolations.size() );
+        checksPositiveValidation(DogsHandler.setCorrectDogDto());
+
+        DogDto boundaryNamedDog = DogsHandler.setCorrectDogDto();
+        boundaryNamedDog.setName(unicode(1));
+        checksPositiveValidation(boundaryNamedDog);
+
+        boundaryNamedDog.setName(unicode(100));
+        checksPositiveValidation(boundaryNamedDog);
+    }
+
+    private void checksPositiveValidation(DogDto dogDto) {
+        Set<ConstraintViolation<DogDto>> constraintViolations =
+                validator.validate(dogDto);
+        assertEquals(constraintViolations.size(), 0);
+    }
+
+    private void checksValidationFail(DogDto dogDto, String message) {
+        Set<ConstraintViolation<DogDto>> constraintViolations =
+                validator.validate(dogDto);
+        assertEquals(1, constraintViolations.size() );
+        assertEquals(message, constraintViolations.iterator().next().getMessage());
     }
 
 }
