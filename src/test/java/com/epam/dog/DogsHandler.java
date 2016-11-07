@@ -2,6 +2,7 @@ package com.epam.dog;
 
 import com.epam.dog.vo.DogDto;
 
+import static io.qala.datagen.RandomDate.*;
 import static io.qala.datagen.RandomShortApi.positiveInteger;
 import static io.qala.datagen.RandomShortApi.unicode;
 
@@ -15,6 +16,7 @@ public class DogsHandler {
         weight = weight != height ? weight : weight + 1;
         dog.setHeight(height);
         dog.setWeight(weight);
+        dog.setDateOfBirth(between(yearsAgo(30), now()).localDate());
         return dog;
     }
 

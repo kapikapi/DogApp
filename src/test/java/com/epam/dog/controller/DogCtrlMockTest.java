@@ -57,9 +57,12 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath(String.format(jsonPathPattern, firstId, "name")).value(firstDog.getName()))
                 .andExpect(jsonPath(String.format(jsonPathPattern, firstId, "height")).value(firstDog.getHeight()))
                 .andExpect(jsonPath(String.format(jsonPathPattern, firstId, "weight")).value(firstDog.getWeight()))
+                .andExpect(jsonPath(String.format(jsonPathPattern, firstId, "dateOfBirth")).value(firstDog.getDateOfBirth()))
                 .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "name")).value(secondDog.getName()))
                 .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "height")).value(secondDog.getHeight()))
-                .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "weight")).value(secondDog.getWeight()));
+                .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "weight")).value(secondDog.getWeight()))
+                .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "dateOfBirth")).value(secondDog.getDateOfBirth()));
+        ;
     }
 
     @Test
@@ -74,7 +77,8 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(updatedDog.getName()))
                 .andExpect(jsonPath("$.height").value(updatedDog.getHeight()))
-                .andExpect(jsonPath("$.weight").value(updatedDog.getWeight()));
+                .andExpect(jsonPath("$.weight").value(updatedDog.getWeight()))
+                .andExpect(jsonPath("$.dateOfBirth").value(updatedDog.getDateOfBirth()));
     }
 
     @Test

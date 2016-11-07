@@ -26,6 +26,7 @@ public class DogController {
         dogDto.setName(dog.getName());
         dogDto.setHeight(dog.getHeight());
         dogDto.setWeight(dog.getWeight());
+        dogDto.setDateOfBirth(dog.getDateOfBirth());
         return dogDto;
     }
 
@@ -58,7 +59,7 @@ public class DogController {
 
     @RequestMapping(value = "/dog", method = RequestMethod.POST)
     public ResponseEntity<DogDto> createDog(@RequestBody @Valid DogDto dogDto, UriComponentsBuilder ucBuilder) {
-        Dog savedDog = dogDAO.saveDog(dogDto.getName(), dogDto.getHeight(), dogDto.getWeight());
+        Dog savedDog = dogDAO.saveDog(dogDto.getName(), dogDto.getHeight(), dogDto.getWeight(), dogDto.getDateOfBirth());
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/dog/{id}").buildAndExpand(savedDog.getId()).toUri());
         return new ResponseEntity<>(dogDto, headers, HttpStatus.CREATED);
@@ -69,7 +70,7 @@ public class DogController {
         if (!dogDAO.hasDog(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            dogDAO.editDogById(id, dog.getName(), dog.getHeight(), dog.getWeight());
+            dogDAO.editDogById(id, dog.getName(), dog.getHeight(), dog.getWeight(), dog.getDateOfBirth());
             return new ResponseEntity<>(dog, HttpStatus.OK);
         }
     }

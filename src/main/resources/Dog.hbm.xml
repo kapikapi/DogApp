@@ -14,5 +14,6 @@
         <property name="name" column="DOG_NAME" type="text"/>
         <property name="height" column="HEIGHT" type="int"/>
         <property name="weight" column="WEIGHT" type="int"/>
+        <property name="dateOfBirth" column="DATE_OF_BIRTH" type="date"/>
     </class>
 </hibernate-mapping>

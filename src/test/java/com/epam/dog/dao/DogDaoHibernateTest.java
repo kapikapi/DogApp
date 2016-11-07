@@ -28,12 +28,13 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
 
     private Dog saveNewDog() {
         DogDto newDog = DogsHandler.setCorrectDogDto();
-        Dog savedDog = dogDAO.saveDog(newDog.getName(), newDog.getHeight(), newDog.getWeight());
+        Dog savedDog = dogDAO.saveDog(newDog.getName(), newDog.getHeight(), newDog.getWeight(), newDog.getDateOfBirth());
         Dog dog = new Dog();
         dog.setId(savedDog.getId());
         dog.setName(savedDog.getName());
         dog.setHeight(savedDog.getHeight());
         dog.setWeight(savedDog.getWeight());
+        dog.setDateOfBirth(savedDog.getDateOfBirth());
         return dog;
     }
 
@@ -78,7 +79,8 @@ public class DogDaoHibernateTest extends AbstractTransactionalTestNGSpringContex
         dog.setName(newDogDto.getName());
         dog.setHeight(newDogDto.getHeight());
         dog.setWeight(newDogDto.getWeight());
-        dogDAO.editDogById(dog.getId(), dog.getName(), dog.getHeight(), dog.getWeight());
+        dog.setDateOfBirth(newDogDto.getDateOfBirth());
+        dogDAO.editDogById(dog.getId(), dog.getName(), dog.getHeight(), dog.getWeight(), dog.getDateOfBirth());
         flushAndClear();
         assertReflectionEquals(dogDAO.getDogById(dog.getId()), dog);
     }

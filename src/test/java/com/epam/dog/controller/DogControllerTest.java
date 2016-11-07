@@ -25,7 +25,8 @@ public class DogControllerTest{
                 .statusCode(200)
                 .body("name", equalTo(newDog.getName()))
                 .body("height", equalTo(newDog.getHeight()))
-                .body("weight", equalTo(newDog.getWeight()));
+                .body("weight", equalTo(newDog.getWeight()))
+                .body("dateOfBirth", equalTo(newDog.getDateOfBirth()));
     }
 
     @Test
@@ -44,9 +45,11 @@ public class DogControllerTest{
                 .body("name", hasItem(firstDog.getName()))
                 .body("height", hasItem(firstDog.getHeight()))
                 .body("weight", hasItem(firstDog.getWeight()))
+                .body("dateOfBirth", hasItem(firstDog.getDateOfBirth()))
                 .body("name", hasItem(secondDog.getName()))
                 .body("height", hasItem(secondDog.getHeight()))
-                .body("weight", hasItem(secondDog.getWeight()));
+                .body("weight", hasItem(secondDog.getWeight()))
+                .body("dateOfBirth", hasItem(secondDog.getDateOfBirth()));
     }
 
     @Test
@@ -76,7 +79,8 @@ public class DogControllerTest{
                 .statusCode(200)
                 .body("name", equalTo(dogDto.getName()))
                 .body("height", equalTo(dogDto.getHeight()))
-                .body("weight", equalTo(dogDto.getWeight()));
+                .body("weight", equalTo(dogDto.getWeight()))
+                .body("dateOfBirth", equalTo(dogDto.getDateOfBirth()));
     }
 
     @Test

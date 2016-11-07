@@ -4,6 +4,7 @@ import com.epam.dog.Balance;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 
 @Balance
 public class DogDto {
@@ -14,6 +15,7 @@ public class DogDto {
     private int height;
     @NotNull
     private int weight;
+    private LocalDate dateOfBirth;
 
     public String getName() {
         return name;
@@ -37,5 +39,13 @@ public class DogDto {
 
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 }

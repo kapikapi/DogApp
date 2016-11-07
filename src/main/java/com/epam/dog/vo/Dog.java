@@ -1,5 +1,7 @@
 package com.epam.dog.vo;
 
+import java.time.LocalDate;
+
 //@Balance
 public class Dog {
 
@@ -8,6 +10,7 @@ public class Dog {
     private String name;
     private int height;
     private int weight;
+    private LocalDate dateOfBirth;
 
     public int getId() {
         return id;
@@ -40,6 +43,15 @@ public class Dog {
     public void setWeight(int weight) {
         this.weight = weight;
     }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
 
     @Override
     public String toString() {
