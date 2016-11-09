@@ -17,6 +17,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static io.qala.datagen.RandomShortApi.unicode;
+import static java.time.LocalDate.now;
 import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -126,11 +127,33 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
     public void correctBorderName_succeedSave() throws Exception {
         DogDto dogDto = DogsHandler.setCorrectDogDto();
         dogDto.setName(unicode(1));
-        int id = saveDog(dogDto);
-        mvc.perform(get("/dog/" + id))
-                .andExpect(status().isOk());
+        checksOKRequest(dogDto);
         dogDto.setName(unicode(100));
-        id = saveDog(dogDto);
+        checksOKRequest(dogDto);
+    }
+
+    @Test
+    public void wrongBirthDate_failsSave() throws Exception {
+        DogDto dogDto = DogsHandler.setFutureBornDogDto();
+        checksBadRequest(dogDto);
+    }
+
+    @Test
+    public void wrongBorderBirthDate_failsSave() throws Exception {
+        DogDto dogDto = DogsHandler.setCorrectDogDto();
+        dogDto.setDateOfBirth(now());
+        checksBadRequest(dogDto);
+    }
+
+    @Test
+    public void correctBorderBirthDate_succeedSave() throws Exception {
+        DogDto dogDto = DogsHandler.setCorrectDogDto();
+        dogDto.setDateOfBirth(now().minusDays(1));
+        checksOKRequest(dogDto);
+    }
+
+    private void checksOKRequest(DogDto dogDto) throws Exception{
+        int id = saveDog(dogDto);
         mvc.perform(get("/dog/" + id))
                 .andExpect(status().isOk());
     }

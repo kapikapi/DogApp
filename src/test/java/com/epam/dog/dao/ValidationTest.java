@@ -9,6 +9,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.time.LocalDate;
 import java.util.Set;
 
 import static io.qala.datagen.RandomShortApi.unicode;
@@ -18,6 +19,7 @@ public class ValidationTest {
 
     private static final String NAME_SIZE_VALIDATION_ERROR_MESSAGE = "Size must be between 1 and 100";
     private static final String UNBALANCED_VALIDATION_ERROR_MESSAGE = "Height and weight are not balanced";
+    private static final String BIRTH_DATE_VALIDATION_ERROR_MESSAGE = "Date of birth must be earlier than today";
 
     private static Validator validator;
 
@@ -52,15 +54,36 @@ public class ValidationTest {
     }
 
     @Test
+    public void failsTodayBirthDateValidation() {
+        DogDto dogDto = DogsHandler.setCorrectDogDto();
+        dogDto.setDateOfBirth(LocalDate.now());
+        checksValidationFail(dogDto, BIRTH_DATE_VALIDATION_ERROR_MESSAGE);
+    }
+
+    @Test
+    public void failsFutureBirthDateValidation() {
+        checksValidationFail(DogsHandler.setFutureBornDogDto(), BIRTH_DATE_VALIDATION_ERROR_MESSAGE);
+    }
+
+    @Test
     public void succeedsDogValidation() {
         checksPositiveValidation(DogsHandler.setCorrectDogDto());
 
-        DogDto boundaryNamedDog = DogsHandler.setCorrectDogDto();
-        boundaryNamedDog.setName(unicode(1));
-        checksPositiveValidation(boundaryNamedDog);
+        DogDto boundaryDog = DogsHandler.setCorrectDogDto();
+        boundaryDog.setName(unicode(1));
+        checksPositiveValidation(boundaryDog);
 
-        boundaryNamedDog.setName(unicode(100));
-        checksPositiveValidation(boundaryNamedDog);
+        boundaryDog.setName(unicode(100));
+        checksPositiveValidation(boundaryDog);
+
+        boundaryDog.setWeight(boundaryDog.getHeight() - 1);
+        checksPositiveValidation(boundaryDog);
+
+        boundaryDog.setWeight(boundaryDog.getHeight() + 1);
+        checksPositiveValidation(boundaryDog);
+
+        boundaryDog.setDateOfBirth(LocalDate.now().minusDays(1));
+        checksPositiveValidation(boundaryDog);
     }
 
     private void checksPositiveValidation(DogDto dogDto) {

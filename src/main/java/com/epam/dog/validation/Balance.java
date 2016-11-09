@@ -1,4 +1,4 @@
-package com.epam.dog;
+package com.epam.dog.validation;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

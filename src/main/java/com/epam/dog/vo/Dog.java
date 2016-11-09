@@ -2,16 +2,12 @@ package com.epam.dog.vo;
 
 import java.time.LocalDate;
 
-//@Balance
 public class Dog {
 
     private int id;
-//    @Size(min = 1, max = 100)
     private String name;
     private int height;
     private int weight;
-//    @JsonSerialize(using = LocalDateSerializer.class)
-//    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate dateOfBirth;
 
     public int getId() {

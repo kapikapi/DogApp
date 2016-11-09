@@ -17,7 +17,7 @@
         <constructor-arg ref="sessionFactory"/>
     </bean>
 
-    <bean name="validator" class="com.epam.dog.BalanceValidator"/>
+    <bean name="validator" class="com.epam.dog.validation.BalanceValidator"/>
 
     <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource">
         <property name="driverClassName" value="org.h2.Driver"/>

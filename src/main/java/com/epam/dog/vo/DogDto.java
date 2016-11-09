@@ -1,6 +1,7 @@
 package com.epam.dog.vo;
 
-import com.epam.dog.Balance;
+import com.epam.dog.validation.Balance;
+import com.epam.dog.validation.BeforeToday;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -15,6 +16,7 @@ public class DogDto {
     private int height;
     @NotNull
     private int weight;
+    @BeforeToday
     private LocalDate dateOfBirth;
 
     public String getName() {
