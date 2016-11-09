@@ -10,6 +10,8 @@ public class Dog {
     private String name;
     private int height;
     private int weight;
+//    @JsonSerialize(using = LocalDateSerializer.class)
+//    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate dateOfBirth;
 
     public int getId() {

@@ -2,7 +2,12 @@ package com.epam.dog;
 
 import com.epam.dog.vo.DogDto;
 
-import static io.qala.datagen.RandomDate.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static io.qala.datagen.RandomDate.between;
+import static io.qala.datagen.RandomDate.yearsAgo;
 import static io.qala.datagen.RandomShortApi.positiveInteger;
 import static io.qala.datagen.RandomShortApi.unicode;
 
@@ -16,7 +21,7 @@ public class DogsHandler {
         weight = weight != height ? weight : weight + 1;
         dog.setHeight(height);
         dog.setWeight(weight);
-        dog.setDateOfBirth(between(yearsAgo(30), now()).localDate());
+        dog.setDateOfBirth(between(yearsAgo(30), yearsAgo(1)).localDate());
         return dog;
     }
 
@@ -30,5 +35,13 @@ public class DogsHandler {
         DogDto dog = setCorrectDogDto();
         dog.setWeight(dog.getHeight());
         return dog;
+    }
+
+    public static List<Integer> localDateToListFormat(LocalDate localDate) {
+        List<Integer> list = new ArrayList<>(3);
+        list.add(localDate.getYear());
+        list.add(localDate.getMonthValue());
+        list.add(localDate.getDayOfMonth());
+        return list;
     }
 }

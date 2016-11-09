@@ -4,6 +4,8 @@ import com.epam.dog.DogsHandler;
 import com.epam.dog.vo.DogDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -15,6 +17,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static io.qala.datagen.RandomShortApi.unicode;
+import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,12 +60,14 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath(String.format(jsonPathPattern, firstId, "name")).value(firstDog.getName()))
                 .andExpect(jsonPath(String.format(jsonPathPattern, firstId, "height")).value(firstDog.getHeight()))
                 .andExpect(jsonPath(String.format(jsonPathPattern, firstId, "weight")).value(firstDog.getWeight()))
-                .andExpect(jsonPath(String.format(jsonPathPattern, firstId, "dateOfBirth")).value(firstDog.getDateOfBirth()))
+                .andExpect(jsonPath(String.format(jsonPathPattern, firstId, "dateOfBirth"),
+                        contains(DogsHandler.localDateToListFormat(firstDog.getDateOfBirth()))))
+//                        .value(DogsHandler.localDateToListFormat(firstDog.getDateOfBirth())))
                 .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "name")).value(secondDog.getName()))
                 .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "height")).value(secondDog.getHeight()))
                 .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "weight")).value(secondDog.getWeight()))
-                .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "dateOfBirth")).value(secondDog.getDateOfBirth()));
-        ;
+                .andExpect(jsonPath(String.format(jsonPathPattern, secondId, "dateOfBirth"),
+                        contains(DogsHandler.localDateToListFormat(secondDog.getDateOfBirth()))));
     }
 
     @Test
@@ -78,7 +83,8 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
                 .andExpect(jsonPath("$.name").value(updatedDog.getName()))
                 .andExpect(jsonPath("$.height").value(updatedDog.getHeight()))
                 .andExpect(jsonPath("$.weight").value(updatedDog.getWeight()))
-                .andExpect(jsonPath("$.dateOfBirth").value(updatedDog.getDateOfBirth()));
+                .andExpect(jsonPath("$.dateOfBirth")
+                        .value(DogsHandler.localDateToListFormat(updatedDog.getDateOfBirth())));
     }
 
     @Test
@@ -149,6 +155,8 @@ public class DogCtrlMockTest extends AbstractTestNGSpringContextTests {
 
     private String objectToJson(Object dog) throws JsonProcessingException {
         final ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         return mapper.writeValueAsString(dog);
     }
 
